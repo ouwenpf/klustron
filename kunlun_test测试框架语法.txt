@@ -1,0 +1,131 @@
+kunlun_test测试框架语法：
+tar xf  kunlun-storage-1.2.1.tgz mv kunlun-storage-1.2.1 kunlun_test_framework
+修改kunlun_test_framework_status1.2.1/mysql-test/kunlun-test中的kunlun-cluster-test.conf为对应环境。 kunlun-test下的kunlun-cluster-test.conf文件 
+python2 ./kunlun-cluster-test.py --config=./kunlun-test/kunlun-cluster-test.conf --test_file=install_rbrcluster.test --record
+
+
+python2 setup_cluster_manager.py --autostart --config=config.json --product_version=1.2.1 --action=install 
+bash -e clustermgr/install.sh
+
+VERSION=1.2.1
+python2 setup_cluster_manager.py --action=download --downloadsite=internal --downloadtype=daily_debug --product_version=$VERSION
+
+http://192.168.0.104:10000/trac/ticket/659                          框架语法简单说明
+http://192.168.0.104:10000/trac/wiki/kunlun.guide.clustermgr_setup_1_2   环境安装
+https://gitee.com/zettadb/kunlun/tree/main/src/test/regress/sql     select测试
+https://github.com/zettadb/cluster_mgr/tree/main/test/hellentest  	1.1.2 测试脚本
+http://192.168.0.104:14000/dailybuilds/enterprise/custom/         	内网版本信息
+http://zettatech.tpddns.cn:14000/releases/				          	外网版本信息
+trac账号，用于登录tracbiz 外网地址：https://zettatech.tpddns.cn:11443/wiki  
+内网地址为 http://192.168.0.104:11000  
+用户名为tanyueyun 密码为  TbRGc3ga1  
+
+
+
+
+
+--set_cluster_id(9)      连接集群ID为9，然后设置集群ID为1且连接这个集群
+--kl_cluster_id(1)
+
+
+--disable_abort_on_error / enable_abort_on_error 	在sql失败后继续执行后面的内容，并生成reject文件
+--disable_warnings
+
+
+--http_connect(cluster_mgr_http1, cluster_mgr,50000)      node_mgr.1
+
+--pg_connect(connection_name, hostname, user, password) -- pg连接  computer.1       前提都要连接到集群ID上才可以使用
+--connect(shard_master1,storage.1.1, clustmgr, clustmgr_pwd)   storage.1.1  第一个存储节点主节点，以此类推
+															   shard_1第一个shard主节点，以此类推
+															   
+
+--connection default     连接默认是连接元数据库kunlun_metadata_db 这个库下面的表
+						 select id,hostaddr,machine_type ,node_stats  from  kunlun_metadata_db.server_nodes   limit 1,1;
+						 
+while($var_name)
+{
+
+dec $var_name;
+}
+
+if($var_name == "XXXX")
+{
+
+}
+
+
+dec $var_name;
+inc $var_name;
+
+--let $slave_host = query_get_value(query, col_name, row_num)获得query返回的结果中某行某列的值 
+                    例如：--let $node_mgr_1 = query_get_value(select hostaddr from server_nodes where machine_type = "computer",addr,1)
+					
+
+					例如：
+					--connection default
+					--let $node_mgr_1 = query_get_value(select hostaddr from server_nodes where machine_type = "computer",hostaddr,1)
+					--let $node_mgr_2 = query_get_value(select hostaddr from server_nodes where machine_type = "computer",hostaddr,2)
+					--let $node_mgr_3 = query_get_value(select hostaddr from server_nodes where machine_type = "computer",hostaddr,3)
+					--echo $node_mgr_1,$node_mgr_2,$node_mgr_3
+					--let $storage_iplists="$node_mgr_1","$node_mgr_2","$node_mgr_3"
+					
+					
+					
+					
+--let c_inc=1       常量赋值
+
+
+--connect(shard_master,$shardid, clustmgr, clustmgr_pwd)
+--connection shard_master
+disconnect shard_master;
+
+
+
+--let $job_id = `http_reap(job_id)` 获取http执行命令结果json中attachment下job_id字段值
+
+
+eval_send  支持变量传递,发送query后不用等待结果立即返回，在reap之前不能使用同一个connection发送sql语句
+			例如：
+			send_eval create table transfer_account_03 partition of  transfer_account for values from (501) to(701) with (shard = $dst_shard_id);
+			reap;
+			
+--exec  执行shell命令
+
+--disable_warnings
+
+
+
+
+
+
+
+
+
+
+
+
+--let $job_id = `http_reap(job_id)`
+--http
+request_type: POST
+header:Content-Type:application/json
+body:{
+"version": "1.0",
+"job_id":"${job_id}",
+"job_type": "get_status",
+"timestamp" : "1435749309",
+"paras": {}
+}
+EOF
+
+
+
+
+curl -d '
+{
+        "version": "1.0",
+        "job_id":"52",
+        "job_type": "get_status",
+        "timestamp" : "1435749309",
+        "paras": {}
+}
+' -X POST http://192.168.0.125:38000/HttpService/Emit

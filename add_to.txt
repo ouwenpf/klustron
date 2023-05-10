@@ -1,0 +1,30 @@
+{
+    "meta":{
+        "ha_mode":"rbr",
+        "group_seeds": "192.168.0.1:57001,192.168.0.2:57001,192.168.0.3:57001"
+    },
+   
+    "node_manager":{
+        "nodes":[
+            {
+                "ip":"192.168.0.1",
+                "brpc_http_port":58002,
+                "tcp_port":58003,
+                "prometheus_port_start":58010
+            },
+            {
+                "ip":"192.168.0.2",
+                "brpc_http_port":58002,
+                "tcp_port":58003,
+                "prometheus_port_start":58010
+            },
+            {
+                "ip":"192.168.0.3",
+                "brpc_http_port":58002,
+                "tcp_port":58003,
+                "prometheus_port_start":58010
+            }
+        ]
+    }
+  
+}

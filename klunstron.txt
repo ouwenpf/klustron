@@ -1,0 +1,186 @@
+ \dt pg_* 系统库
+ \dv pg_* 系统视图
+ \dtS
+ \dvS
+ \diS
+ \dfS
+ select * from information_schema.tables 相当于all tables  \dtS查询不到这么全
+ show config_file ;
+ show hba_file ;
+
+ 
+ 登录计算节点：
+				psql  -h127.0.0.1 -Uabc -p47001  postgres
+				mysql -P47002  -uabc  -pabc  -h172.16.0.8
+ 登录元数据节点：
+				mysql -P6001 -uclustmgr -pclustmgr_pwd  -h172.16.0.8
+                mysql -P36001 -upgx  -ppgx_pwd   -h192.168.0.129
+				复制：repl：repl_pwd
+ kunlun_metadata_db:源数库集群查询
+ 
+select * from kunlun_metadata_db.cluster_mgr_nodes ; 查询集群管理器节点信息(主节点宕机主备切换)
++----+---------------+-------+-----------------+--------------+
+| id | hostaddr      | port  | prometheus_port | member_state |
++----+---------------+-------+-----------------+--------------+
+|  1 | 192.168.0.125 | 38000 |           38002 | replica      |
+|  2 | 192.168.0.129 | 38000 |           38002 | source       |
+|  3 | 192.168.0.134 | 38000 |           38002 | replica      |
++----+---------------+-------+-----------------+--------------+
+select id,hostaddr,port,member_state,sync_state,nodemgr_bin_path from kunlun_metadata_db.meta_db_nodes ;查询元数据节点信息(主节点宕机主备切换)
++----+---------------+-------+--------------+------------+---------------------------------------------------------+
+| id | hostaddr      | port  | member_state | sync_state | nodemgr_bin_path                                        |
++----+---------------+-------+--------------+------------+---------------------------------------------------------+
+|  1 | 192.168.0.129 | 36001 | source       | fsync      | /home/tanyueyun/kunlunbas/kunlun-node-manager-1.1.1/bin |
+|  2 | 192.168.0.125 | 36001 | replica      | fsync      | /home/tanyueyun/kunlunbas/kunlun-node-manager-1.1.1/bin |
+|  3 | 192.168.0.134 | 36001 | replica      | fsync      | /home/tanyueyun/kunlunbas/kunlun-node-manager-1.1.1/bin |
++----+---------------+-------+--------------+------------+---------------------------------------------------------+
+
+select  shard_id,hostaddr,port,member_state,db_cluster_id,status,backup_node,sync_state from kunlun_metadata_db.shard_nodes where status='active' order by 1;查询存储节点信息(主节点宕机主备切换)
++----------+---------------+-------+--------------+---------------+-------------+------------+
+| shard_id | hostaddr      | port  | member_state | db_cluster_id | backup_node | sync_state |
++----------+---------------+-------+--------------+---------------+-------------+------------+
+|        4 | 192.168.0.134 | 57005 | source       |             2 | OFF         | fsync      |
+|        4 | 192.168.0.129 | 57005 | replica      |             2 | ON          | fsync      |
+|        4 | 192.168.0.125 | 57005 | replica      |             2 | OFF         | fsync      |
+|        5 | 192.168.0.125 | 57001 | source       |             2 | OFF         | fsync      |
+|        5 | 192.168.0.129 | 57001 | replica      |             2 | ON          | fsync      |
+|        5 | 192.168.0.134 | 57001 | replica      |             2 | OFF         | fsync      |
+|        6 | 192.168.0.129 | 57003 | source       |             2 | OFF         | fsync      |
+|        6 | 192.168.0.134 | 57003 | replica      |             2 | ON          | fsync      |
+|        6 | 192.168.0.125 | 57003 | replica      |             2 | OFF         | fsync      |
++----------+---------------+-------+--------------+---------------+-------------+------------+
+
+
+
+select db_cluster_id, hostaddr,port,user_name,passwd,status from kunlun_metadata_db.comp_nodes where status='active';
+计算节点无状态，节点宕机自动拉起
++---------------+---------------+-------+-----------+--------+--------+
+| db_cluster_id | hostaddr      | port  | user_name | passwd | status |
++---------------+---------------+-------+-----------+--------+--------+
+|             2 | 192.168.0.129 | 47001 | abc       | abc    | active |
+|             2 | 192.168.0.125 | 47001 | abc       | abc    | active |
+|             2 | 192.168.0.134 | 47001 | abc       | abc    | active |
++---------------+---------------+-------+-----------+--------+--------+
+
+
+
+select id,hostaddr,machine_type ,node_stats  from  kunlun_metadata_db.server_nodes  ;
+计算机管理列表
++----+-----------------------+--------------+------------+
+| id | hostaddr              | machine_type | node_stats |
++----+-----------------------+--------------+------------+
+|  1 | pseudo_server_useless | NULL         | running    |
+|  2 | 172.16.0.4            | storage      | running    |
+|  3 | 172.16.0.4            | computer     | running    |
+|  4 | 172.16.0.8            | storage      | running    |
+|  5 | 172.16.0.8            | computer     | running    |
+|  6 | 172.16.0.15           | storage      | running    |
+|  7 | 172.16.0.15           | computer     | running    |
++----+-----------------------+--------------+------------+
+
+
+
+ps aux|grep -E  'cluster_mgr|prometheus'|grep -v 'grep' 查询集群管理相关进程(主节点显示58000和59010端口)
+ps aux|grep -E  'node_mgr|node_exporter' |grep -v 'grep' 查询节点相关进程(端口58002，58003，58005，58010)
+ps axu|grep  -E  'instance_binaries/computer|postgres_exporter'|grep -v 'grep' 计算节点(默认47001，47002，47003)
+ps axu|grep  -E  'instance_binaries/storage'|grep -v 'grep'  元数据和存储节点相关进程(默认57001开头)
+ 
+
+
+
+
+
+
+
+
+node_mgr.1 -- 连接元数据表中第一个node_mgr
+select id,hostaddr,machine_type ,node_stats  from  kunlun_metadata_db.server_nodes   limit 1,1;
+
+
+node_mgr.1.1 -- 连接shard1下面第一个node_mgr
+storage.1.1  -- 连接shard1的第一个存储节点
+
+
+shard.1 -- shard1的存储主节点
+
+storage.1 -- 元数据表中第一个存储节点
+select id,hostaddr,machine_type ,node_stats  from  kunlun_metadata_db.server_nodes   limit 1,1;
+
+
+
+computer.1 -- 元数据表中第一个计算节点
+select id,hostaddr,machine_type ,node_stats  from  kunlun_metadata_db.server_nodes   limit 1,1;
+
+
+
+
+
+
+
+
+ 
+ 
+
+ 
+ 查看数据的分布情况
+ select relname table_name ,reltuples num_rows, name shard_name from pg_class t1,pg_shard t2 where t1.relshardid = t2.id and t1.reltype<>0 and t1.relname like '%test%';
+ 
+存储节点信息
+select t1.name, t2.shard_id, t2.hostaddr ip , t2.port, t2.user_name, t2.passwd from pg_shard t1, pg_shard_node t2  where t2.shard_id=t1.id;
+
+查询获得每个表所属的 schema（即 nspname 列），其表文件在哪个存储集群（即 relshardid）等信息
+select t1.nspname, t2.relname, t2.relshardid, t2.relkind from pg_namespace t1 join pg_class t2 on t1.oid=t2.relnamespace where t2.relshardid != 0 order by t1.nspname;
+
+ 
+ 
+ 
+ 
+ 进入某个数据库
+ 
+ DB=# \c dbname
+ 
+ 查看表空间
+
+select * from pg_tablespace;
+
+查询所有schema
+select * from information_schema.schemata;
+\dnS
+
+
+只能查看到当前数据库下public的表名
+DB=# \dt 
+select * from information_schema.tables ;查询所有表名
+
+查看表结构
+
+DB=# \d tablename
+
+查询系统表，视图，索引函数
+ \dtS
+ \dvS
+ \diS
+ \dfS
+ 
+ 
+ 
+ 
+ DB=# \h grant
+
+GRANT ALL PRIVILEGES ON schema schemaname TO dbuser;
+
+grant ALL PRIVILEGES on all tables in schema fds to dbuser;
+
+GRANT ALL ON tablename TO user;
+
+GRANT ALL PRIVILEGES ON DATABASE dbname TO dbuser;
+
+grant select on all tables in schema public to dbuser;--给用户读取public这个schema下的所有表
+
+GRANT create ON schema schemaname TO dbuser;--给用户授予在schema上的create权限，比如create table、create view等
+
+GRANT USAGE ON schema schemaname TO dbuser;
+
+grant select on schema public to dbuser;--报错ERROR: invalid privilege type SELECT for schema
+
+--USAGE：对于程序语言来说，允许使用指定的程序语言创建函数;对于Schema来说，允许查找该Schema下的对象;对于序列来说，允许使用currval和nextval函数;对于外部封装器来说，允许使用外部封装器来创建外部服务器;对于外部服务器来说，允许创建外部表。

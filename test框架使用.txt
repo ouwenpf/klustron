@@ -1,0 +1,4 @@
+http://192.168.0.104:10000/trac/ticket/659
+http://192.168.0.104:10000/trac/wiki/kunlun.guide.clustermgr_setup_1_2
+https://gitee.com/zettadb/kunlun/tree/main/src/test/regress/sql
+https://github.com/zettadb/cluster_mgr/tree/main/test/hellentest    1.1.2

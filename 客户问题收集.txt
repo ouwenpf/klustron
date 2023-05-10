@@ -1,0 +1,56 @@
+用户使用问题：
+1.计算节点默认max_connections=1000
+调整方法：
+1.1：安装目录如：/home/tanyueyun/kunlunbase/server_datadir/47001/postgresql.conf 修改后可以在xpanel上面重启
+1.2：安装目录如：/home/tanyueyun/kunlunbase/instance_binaries/computer/47001/kunlun-server-1.2.1/scripts
+python2 start_pg.py --port 47001  python2 stop_pg.py --port 47001 
+
+2.kunlunbase数据库计算节点默认pg和mysql分不通的端口
+mysql端口登录使用pg登录计算节点执行show mysql_port或者使用xpenal上面查询
+
+
+
+
+
+北京海泰方圆科技股份有限公司
+万兴科技集团股份有限公司
+北京致远互联软件股份有限公司
+上海采和信息科技有限公司
+永中软件股份有限公司
+
+
+
+
+
+sudo docker run -d    --network tan-net  --ip 172.16.0.15  --cap-add=SYS_PTRACE --cap-add=NET_ADMIN  --privileged=true --name kunlun4  -h kunlun1  centos7_base:v6  /usr/sbin/init
+
+sudo docker run -itd --network tan-net  --ip 172.16.0.14 --restart=always --env \ METASEEDS=172.16.0.15:36001,172.16.0.16:36001,172.16.0.17:36001 --name xpanel_18080 -p 18080:80 \  registry.cn-hangzhou.aliyuncs.com/kunlundb/kunlun-xpanel:1.2.1 bash -c '/bin/bash /kunlun/start.sh'
+
+
+/usr/local/bin/sysbench  /usr/local/share/sysbench/oltp_read_write.lua --tables=10 --table-size=1000   --db-ps-mode=disable --db-driver=pgsql --pgsql-host=172.16.0.15  --report-interval=10 --pgsql-port=47001  --pgsql-user=abc --pgsql-password=abc --pgsql-db=postgres --threads=10   --time=300   cleanup 
+
+
+/usr/local/bin/sysbench  /usr/local/share/sysbench/oltp_read_write.lua --tables=10 --table-size=10000   --db-ps-mode=disable --db-driver=pgsql --pgsql-host=172.16.0.15  --report-interval=10 --pgsql-port=47001  --pgsql-user=abc --pgsql-password=abc --pgsql-db=postgres --threads=10   --time=300   prepare
+
+
+/usr/local/bin/sysbench  /usr/local/share/sysbench/oltp_read_write.lua --tables=10 --table-size=10000 --db-ps-mode=disable --db-driver=pgsql --pgsql-host=172.17.0.2  --report-interval=10 --pgsql-port=5401 --pgsql-user=abc --pgsql-password=abc --pgsql-db=postgres --threads=10 --time=300 --rand-type=uniform run
+
+
+hosts=172.16.0.15:36001;172.16.0.16:36001;172.16.0.17:36001
+cl_mgr=172.16.0.15:38000;172.16.0.16:38000;172.16.0.17:38000
+
+curl -d '
+{
+        "version": "1.0",
+        "job_id":"64",
+        "job_type": "get_status",
+        "timestamp" : "1435749309",
+        "paras": {}
+}
+' -X POST http://192.168.0.125:38000/HttpService/Emit
+
+相应的node节点查询日志
+grep 'execute'  sys_node_mgr.2023-04-28.log.0  
+
+grep '\-action=add'  sys_node_mgr.2023-04-28.log.0    
+grep '\-action=delete'  sys_node_mgr.2023-04-28.log.0 

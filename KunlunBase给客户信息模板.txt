@@ -1,0 +1,17 @@
+PostgreSQL 协议连接方式：
+PGPASSWORD=abc;psql -h zettatech.tpddns.cn -U abc -p 5432 -d postgres
+PGPASSWORD=abc;psql postgres://abc:abc@zettatech.tpddns.cn:5432/postgres
+
+MySQL 协议连接方式：
+mysql -h zettatech.tpddns.cn -uabc -pabc -P 3306
+
+
+Klustron 提供了XPanel GUI工具软件，让DBA通过点击鼠标就可以轻松完成所有的数据库运维管理工作
+XPANEL 访问地址：
+http://zettatech.tpddns.cn:18851/KunlunXPanel/
+初始化账户：super_dba
+初始化密码：super_dba
+
+
+
+

@@ -1,0 +1,16 @@
+#Use case description:
+#1.create cluster  &&  delete cluster 
+--source kunlun-test/include/install_cluster.inc 
+--let $job_id = `http_reap(job_id)`
+
+
+--sleep 100
+
+--source kunlun-test/include/del_cluster.inc 
+--let $job_id = `http_reap(job_id)`
+
+
+
+
+
+ 

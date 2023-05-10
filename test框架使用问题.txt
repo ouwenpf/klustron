@@ -1,0 +1,77 @@
+1.1.1
+--connection default
+--let $cluster_id = query_get_value(select id  from db_clusters  where status='inuse',id,1)
+--echo $cluster_id
+--set_cluster_id($cluster_id)
+--kl_cluster_id(1)
+
+这个变量$cluster_id  --set_cluster_id($cluster_id) 传不进来，这个知道怎么传进来吗？
+
+
+
+/home/tanyueyun/kunlun_test_framework_1.1.1/bin/mysqltest: symbol lookup error: /lib64/libk5crypto.so.3: undefined symbol: EVP_KDF_ctrl, version OPENSSL_1_1_1b
+
+~kunlun_test_framework/lib
+mv private private2
+ cp deps/libk5crypto.so.3 .
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+curl -d '
+
+' -X POST http://192.168.0.125:38000/HttpService/Emit
+
+
+
+
+
+
+
+
+
+curl -d '
+{
+          "version":"1.0",
+        "job_id":"",
+        "job_type":"create_cluster",
+        "user_name":"kunlun_test",
+        "timestamp":"202205131532",
+        "paras":{
+              "nick_name":"rbrcluster001",
+              "ha_mode":"rbr",
+              "shards":"1",
+              "nodes":"3",
+              "comps":"1",
+              "max_storage_size":"20",
+              "max_connections":"6",
+              "cpu_cores":"8",
+              "innodb_size":"1",
+              "data_storage_MB":"1024",
+	      "log_storage_MB":"1024",
+              "dbcfg":"0",
+              "fullsync_level": "1",
+              "storage_iplists": [
+                   172.16.0.15,
+				   172.16.0.16,
+				   172.16.0.17
+                ],
+              "computer_iplists": [
+                   172.16.0.15,
+                   172.16.0.16,        
+                   172.16.0.17
+				]
+	}
+}
+
+' -X POST http://192.168.0.125:38000/HttpService/Emit
+
+
+
+
+

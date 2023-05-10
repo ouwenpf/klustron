@@ -1,0 +1,76 @@
+{
+   "machines": [
+      {
+         "ip": "127.0.0.1",
+         "basedir": "/data/kulunbase",
+         "user": "kunlun"
+      }
+   ],
+   "meta": {
+      "ha_mode": "rbr",
+      "nodes": [
+         {
+            "ip": "127.0.0.1"
+         },
+         {
+            "ip": "127.0.0.1"
+         },
+         {
+            "ip": "127.0.0.1"
+         }
+      ]
+   },
+   "cluster_manager": {
+      "nodes": [
+         {
+         "ip": "127.0.0.1",
+	    "brpc_raft_port": 40001,
+	    "brpc_http_port": 40003,
+	    "prometheus_port_start": 40005
+         }
+      ]
+   },
+   "node_manager": {
+      "nodes": [
+         {
+         "ip": "127.0.0.1",
+	    "brpc_http_port": 40011,
+	    "tcp_port": 40013,
+	    "prometheus_port_start": 40015,
+	    "storage_portrange": "40200-40300",
+	    "server_portrange": "40400-40500"
+         }
+      ]
+   },
+   "clusters": [
+      {
+         "name": "oneshard",
+         "ha_mode": "rbr",
+	 "storage_template": "small",
+         "comp": {
+            "nodes": [
+               {
+                  "ip": "127.0.0.1",
+                  "user": "abc",
+                  "password": "abc"
+               }
+            ]
+         },
+         "data": [
+            {
+               "nodes": [
+                  {
+                     "ip": "127.0.0.1"
+                  },
+                  {
+                     "ip": "127.0.0.1"
+                  },
+                  {
+                     "ip": "127.0.0.1"
+                  }
+               ]
+            }
+         ]
+      }
+   ]
+}

@@ -1,0 +1,231 @@
+
+python setup_cluster_manager.py --autostart --config=cluster_and_node_mgr.json --product_version=1.1.1 --action=install 
+bash -e clustermgr/install.sh
+
+
+trac账号，用于登录tracbiz 外网地址：https://zettatech.tpddns.cn:11443/wiki  
+内网地址为 http://192.168.0.104:11000  
+用户名为tanyueyun 密码为  TbRGc3ga1  
+
+
+http://192.168.0.104:10000/trac/wiki
+https://zettatech.tpddns.cn:11443/trac/wiki
+
+machines标签:
+	ip:工作机器的地址
+	sshport:22 //default 22,如果默认非22，生成安装脚本后，需要手工改一下默认端口
+	basedir： //default /kunlun工作机器上的工作目录，必须是绝对路径	
+	user：   //default  kunlun  由于计算节点无法以 root 用户启动，所以要求该属性值不能是 "root"
+
+meta标签:
+	ha_mode：元数据节点之间的复制模式从1.1开始一般建议设置为 'rbr'， 当前默认值为 'rbr' 
+	group_seeds: 已经安装的元数据组的地址，开始按照的时候需要配置，后续操作其他批次对象，不需要设置该属性
+	nodes：指定元数据组中每个元数据节点的详细配置
+		ip：元数据节点工作机器地址，必须设置
+		prot：元数据节点开放的监听端口，不填写则脚本自动在指定范围内选择一个//default 57001
+
+cluster_mamanger标签:
+	ip: 用于表示集群管理器的工作机器地址，必须设置。
+	brpc_http_port:58000      集群管理器监听的 http端口  //default 58000
+	brpc_raft_port:58001	  集群管理器监听的 raft端口 //default  58001
+	prometheus_port_start:59010  cluster_mgr的prometheus端口 //default 59010
+    ps aux|grep -E 'cluster_mgr|prometheus'|grep -v 'grep' 查询相关进程(主节点显示58000和59010端口)
+ 
+
+
+node_manager标签:
+    ip: 用于表示节点管理器的工作机器地址，必须设置。
+	brpc_http_port:58002     节点管理器监听的http端口    //default 58002
+	tcp_port:58003			 节点管理器监听的tcp端口     //default 58003
+	prometheus_port_start:58010 用于指定node_mgr的prometheus 端口  //default 58010
+	storage_portrange：储节点使用的端口范围默认[57000-58000]
+	server_portrange： 计算节点的端口范围默认[47000-48000]
+	total_cpu_cores：指定机器的 cpu 数量，整型, 该值默认为 8
+	total_mem：指定机器的内存数，整型。单位为 MB, 默认值为 16384
+	
+	storage_datadirs：元数据和存储节点的数据目录
+	storage_logdirs： 元数据和存储节点的错误日志目录
+	storage_waldirs：元数据和存储节点的重做日志目录
+	server_datadirs：计算节点的数据目录
+	
+	
+	ps aux|grep -E  'cluster_mgr|prometheus'|grep -v 'grep' 查询集群管理相关进程(主节点显示58000和59010端口)
+	ps aux|grep -E  'node_mgr|node_exporter' |grep -v 'grep' 查询节点相关进程(端口58002，58003，58005，58010)
+    ps axu|grep  -E  'instance_binaries/computer|postgres_exporter'|grep -v 'grep' 计算节点(默认47001，47002，47003)
+	ps axu|grep  -E  'instance_binaries/storage'|grep -v 'grep'  元数据和存储节点相关进程(默认57001开头)
+     
+
+
+
+xpanel标签
+	ip:   指定 xpanel 所在机器地址
+	port：18080       //default  18080
+	image：镜像 url, 必须指定。可以是一个本地或者远程镜像url
+	http://192.168.0.110:18080/KunlunXPanel
+
+
+
+elasticsearch标签
+	ip:   指定ElasticSearch/Kibana所在机器的ip地址
+	port：指定elasticsearch 的端口，//default 9200 
+	kibana_port：指定kibana的端口，默认 5601
+	http://192.168.0.111:5601
+
+
+backup标签：支持 ssh 和 hdfs 两种备份方式
+    "backup":{
+        "hdfs":[
+            {
+                "ip":"127.0.0.1",
+                "prot":9200
+            }
+        ],
+        "ssh":[
+            {
+                "ip":"127.0.0.1",
+                "prot":22,
+                "user":"kunlun",
+                "targetDir":"/data/backup"
+            }
+        ]
+    },
+
+
+
+
+
+------具体配置如下，json格式建议使用json语法检查一下
+
+
+
+
+{
+    "machines":[
+        {
+            "ip":"192.168.0.110",
+			"sshport":52553,   //default 22
+            "basedir":"/kunlun",
+            "user":"kunlun"
+        },
+        {
+            "ip":"192.168.0.111",
+			"sshport":52553,   //default 22
+			"basedir":"/kunlun",
+            "user":"kunlun"
+        },
+        {
+            "ip":"192.168.0.100",
+			"sshport":52553,   //default 22
+            "basedir":"/kunlun",
+            "user":"kunlun"
+        }
+    ],
+    "meta":{
+	"ha_mode": "rbr",
+	//"group_seeds": "192.168.0.2:6001,192.168.0.3:6001,192.168.0.4:6001", 新增节点需要配置
+        "nodes":[
+ 		{
+ 		"ip":"192.168.0.110",
+		"port":6001   
+                },
+                {
+ 		"ip":"192.168.0.111",
+		"port":6001
+                },
+                {
+ 		"ip":"192.168.0.100",
+		"port":6001
+                }
+        ]
+    },
+    "cluster_manager": {
+           "nodes": [
+		{
+ 		"ip": "192.168.0.110" ,
+		"brpc_http_port":58000,
+	    "brpc_raft_port":58001
+		},
+		{
+ 		"ip": "192.168.0.111",
+		"brpc_http_port":58000,
+	    "brpc_raft_port":58001
+		},
+		{
+ 		"ip": "192.168.0.100",
+		"brpc_http_port":58000,
+	    "brpc_raft_port":58001
+		}
+	    ]	
+    },
+    "node_manager": {
+           "nodes": [
+		{
+ 		"ip": "192.168.0.110",
+		"brpc_http_port":58003,          //default 58002
+		"tcp_port":58004,				//default 58003
+        "prometheus_port_start":58005  //default 58010
+		},
+		{
+ 		"ip": "192.168.0.111",
+		"brpc_http_port":58003,          //default 58002
+		"tcp_port":58004,				//default 58003
+        "prometheus_port_start":58005  //default 58010
+		},
+		{ 
+ 		"ip": "192.168.0.100",
+		"brpc_http_port":58003,          //default 58002
+		"tcp_port":58004,				//default 58003
+        "prometheus_port_start":58005  //default 58010
+		}
+	    ]	
+    },
+	
+	  //"elasticsearch": {
+      //"ip": "192.168.0.111",
+	  //"port":9200,
+	  //"kibana_prot":5601
+    //},
+	
+	
+    "xpanel": {
+	"ip": "192.168.0.110",
+	"port":18080,  //default port
+	"image": "registry.cn-hangzhou.aliyuncs.com/kunlundb/kunlun-xpanel:1.1.1"
+    }
+
+}    
+
+
+
+
+
+
+
+
+{
+  "comp":[{
+    "statement_timeout":1200000,
+    "mysql_read_timeout":1200,
+    "mysql_write_timeout":1200,
+    "lock_timeout":1200000,
+    "log_min_duration_statement":1200000
+  }
+  ],
+  "metadata":[{
+    "lock_wait_timeout":1200,
+    "innodb_lock_wait_timeout":1200,
+    "innodb_buffer_pool_size": "5*1024*1024*1024"
+  }
+  ],
+  "storage":[{
+    "innodb_buffer_pool_size": "10*1024*1024*1024",
+    "lock_wait_timeout":1200,
+    "innodb_lock_wait_timeout":1200,
+    "fullsync_timeout":1200000,
+    "enable_fullsync": "ON",
+    "innodb_flush_log_at_trx_commit": 1,
+    "sync_binlog": 1,
+    "max_binlog_size": "1*1024*1024*1024"
+  }
+  ]
+}

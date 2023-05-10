@@ -1,0 +1,119 @@
+{
+    "machines":[
+        {
+            "ip":"192.168.0.1",
+            "sshport":22,
+            "basedir":"/kunlun",
+            "user":"kunlun"
+        },
+        {
+            "ip":"192.168.0.2",
+            "sshport":22,
+            "basedir":"/kunlun",
+            "user":"kunlun"
+        },
+        {
+            "ip":"192.168.0.3",
+            "sshport":22,
+            "basedir":"/kunlun",
+            "user":"kunlun"
+        }
+    ],
+    "meta":{
+        "ha_mode":"rbr",
+        "nodes":[
+            {
+                "ip":"192.168.0.1",
+                "port":6001
+            },
+            {
+                "ip":"192.168.0.2",
+                "port":6001
+            },
+            {
+                "ip":"192.168.0.3",
+                "port":6001
+            }
+        ]
+    },
+    "cluster_manager":{
+        "nodes":[
+            {
+                "ip":"192.168.0.1",
+                "brpc_http_port":58000,
+                "brpc_raft_port":58001,
+                "prometheus_port_start":59010
+            },
+            {
+                "ip":"192.168.0.2",
+                "brpc_http_port":58000,
+                "brpc_raft_port":58001,
+                "prometheus_port_start":59010
+            },
+            {
+                "ip":"192.168.0.3",
+                "brpc_http_port":58000,
+                "brpc_raft_port":58001,
+                "prometheus_port_start":59010
+            }
+        ]
+    },
+    "node_manager":{
+        "nodes":[
+            {
+                "ip":"192.168.0.1",
+                "brpc_http_port":58002,
+                "tcp_port":58003,
+                "prometheus_port_start":58010,
+				"storage_portrange": "57000-58000",
+				"server_portrange": "47000-48000"
+
+            },
+            {
+                "ip":"192.168.0.2",
+                "brpc_http_port":58002,
+                "tcp_port":58003,
+                "prometheus_port_start":58010,
+				"storage_portrange": "57000-58000",
+				"server_portrange": "47000-48000"
+            },  
+			
+            {
+                "ip":"192.168.0.3",
+                "brpc_http_port":58002,
+                "tcp_port":58003,
+                "prometheus_port_start":58010,
+				"storage_portrange": "57000-58000",
+				"server_portrange": "47000-48000"
+            }
+        ]
+    },
+    "hdfs":{
+                "ip":"127.0.0.1",
+                "port":9200
+	       },
+		   
+		   
+     "ssh":{
+            
+                "ip":"127.0.0.1",
+                "port":22,
+                "user":"kunlun",
+                "targetDir":"/data/backup"
+            
+        
+    },
+	
+	 "elasticsearch": {
+      "ip": "192.168.0.111",
+	  "port":9200,
+	  "kibana_prot":5601
+    },
+	
+	
+    "xpanel":{
+        "ip":"192.168.0.1",
+        "port":18080,
+        "image":"registry.cn-hangzhou.aliyuncs.com/kunlundb/kunlun-xpanel:1.1.1"
+    }
+}
