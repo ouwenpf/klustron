@@ -24,7 +24,7 @@ mysql端口登录使用pg登录计算节点执行show mysql_port或者使用xpen
 
 sudo docker run -d    --network tan-net  --ip 172.16.0.15  --cap-add=SYS_PTRACE --cap-add=NET_ADMIN  --privileged=true --name kunlun4  -h kunlun1  centos7_base:v6  /usr/sbin/init
 
-sudo docker run -itd --network tan-net  --ip 172.16.0.14 --restart=always --env \ METASEEDS=172.16.0.15:36001,172.16.0.16:36001,172.16.0.17:36001 --name xpanel_18080 -p 18080:80 \  registry.cn-hangzhou.aliyuncs.com/kunlundb/kunlun-xpanel:1.2.1 bash -c '/bin/bash /kunlun/start.sh'
+sudo docker run -itd --network tan-net  --ip 172.16.0.14 --restart=always --env  METASEEDS=172.16.0.15:36001,172.16.0.16:36001,172.16.0.17:36001 --name xpanel_18080 -p 18080:80   registry.cn-hangzhou.aliyuncs.com/kunlundb/kunlun-xpanel:1.2.1 bash -c '/bin/bash /kunlun/start.sh'
 
 
 /usr/local/bin/sysbench  /usr/local/share/sysbench/oltp_read_write.lua --tables=10 --table-size=1000   --db-ps-mode=disable --db-driver=pgsql --pgsql-host=172.16.0.15  --report-interval=10 --pgsql-port=47001  --pgsql-user=abc --pgsql-password=abc --pgsql-db=postgres --threads=10   --time=300   cleanup 

@@ -22,7 +22,7 @@ systemctl stop firewalld
 systemctl disable firewalld
 systemctl enable chronyd
 systemctl start chronyd
-groupadd -g 1008 tanyueyun 
+groupadd -g 1008 $klunstron_user 
 useradd  -u 1007 -g 1008 $klunstron_user
 echo 'kunlun#'|passwd  --stdin $klunstron_user
 sed -ri '/Allow root to run any commands anywhere/a '${klunstron_user}'  ALL=(ALL)  NOPASSWD: ALL'  /etc/sudoers

@@ -24,14 +24,17 @@
         "nodes":[
             {
                 "ip":"192.168.0.1",
+				"innodb_buffer_pool_size":"64MB",
                 "port":6001
             },
             {
                 "ip":"192.168.0.2",
+				"innodb_buffer_pool_size":"64MB",
                 "port":6001
             },
             {
                 "ip":"192.168.0.3",
+				"innodb_buffer_pool_size":"64MB",
                 "port":6001
             }
         ]
@@ -88,21 +91,23 @@
             }
         ]
     },
-    "hdfs":{
+	"backup":{
+		"hdfs":[
+				{
                 "ip":"127.0.0.1",
                 "port":9200
-	       },
-		   
-		   
-     "ssh":{
-            
-                "ip":"127.0.0.1",
-                "port":22,
-                "user":"kunlun",
-                "targetDir":"/data/backup"
-            
-        
-    },
+	            }
+			   ],
+		"ssh":[
+			{
+			"ip":"127.0.0.1",
+			"port":22,
+			"user":"kunlun",
+			"targetDir":"/data/backup"
+			}
+			]   
+	     },
+		 
 	
 	 "elasticsearch": {
       "ip": "192.168.0.111",
