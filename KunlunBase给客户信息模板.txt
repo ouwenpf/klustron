@@ -1,6 +1,6 @@
 PostgreSQL 协议连接方式：
-PGPASSWORD=abc;psql -h zettatech.tpddns.cn -U abc -p 5432 -d postgres
-PGPASSWORD=abc;psql postgres://abc:abc@zettatech.tpddns.cn:5432/postgres
+PGPASSWORD=abc psql -h zettatech.tpddns.cn -U abc -p 5432 -d postgres
+PGPASSWORD=abc psql postgres://abc:abc@zettatech.tpddns.cn:5432/postgres
 
 MySQL 协议连接方式：
 mysql -h zettatech.tpddns.cn -uabc -pabc -P 3306

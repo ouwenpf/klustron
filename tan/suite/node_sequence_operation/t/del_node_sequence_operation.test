@@ -1,0 +1,39 @@
+#create cluster
+#check node create time stamp
+--source kunlun-test/suite/node_sequence_operation/include/del_cluster.inc
+
+--connection default
+--let $date = `select curdate();`
+
+#comp ip and datadir
+#--let $comp_ip=`select hostaddr  from kunlun_metadata_db.server_nodes  where  node_stats='running' and machine_type='computer' and comp_datadir is not null ;`
+
+#--let $comp_datadir=`select comp_datadir  from kunlun_metadata_db.server_nodes  where  node_stats='running' and machine_type='computer' and comp_datadir is not null ;`
+
+--let $comp_ip = query_get_value(select hostaddr  from kunlun_metadata_db.server_nodes  where  node_stats='running' and machine_type='computer' and comp_datadir is not null,hostaddr,1)
+
+--let $comp_datadir = query_get_value(select comp_datadir  from kunlun_metadata_db.server_nodes  where  node_stats='running' and machine_type='computer' and comp_datadir is not null,comp_datadir,1)
+
+
+#storage ip and datadir
+#--let $storage_ip=`select hostaddr   from kunlun_metadata_db.server_nodes  where  node_stats='running' and machine_type='storage' and datadir  is not null ;`
+
+#--let $storage_datadir=`select datadir   from kunlun_metadata_db.server_nodes  where  node_stats='running' and machine_type='storage' and datadir  is not null ;`
+
+
+--let $storage_ip = query_get_value(select hostaddr  from kunlun_metadata_db.server_nodes  where  node_stats='running' and machine_type='storage' and datadir  is not null,hostaddr,1)
+
+--let $storage_datadir = query_get_value(select datadir  from kunlun_metadata_db.server_nodes  where  node_stats='running' and machine_type='storage' and datadir  is not null,datadir,1)
+
+
+#node_log
+--let $node_mgr_ip=`select hostaddr  from  meta_db_nodes  where member_state='source' ;`
+--let $node_mgr_log=`select nodemgr_bin_path  from  meta_db_nodes  where member_state='source' ;`
+
+
+
+
+--exec ssh $storage_ip "cd $node_mgr_log;cd ..;cd log;egrep '\-action=delete' sys_node_mgr.$date.log.0|tail -6"
+
+
+
