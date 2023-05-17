@@ -6,6 +6,7 @@ python2 ./kunlun-cluster-test.py --config=./kunlun-test/kunlun-cluster-test.conf
 
 python2 setup_cluster_manager.py --autostart --config=config.json --product_version=1.2.1 --action=install 
 bash -e clustermgr/install.sh
+http://192.168.0.125:18080/KunlunXPanel/
 
 VERSION=1.2.1
 python2 setup_cluster_manager.py --action=download --downloadsite=internal --downloadtype=daily_debug --product_version=$VERSION

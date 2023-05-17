@@ -24,17 +24,17 @@
         "nodes":[
             {
                 "ip":"192.168.0.1",
-				"innodb_buffer_pool_size":"64MB",
+				"innodb_buffer_pool_size":"128MB",
                 "port":6001
             },
             {
                 "ip":"192.168.0.2",
-				"innodb_buffer_pool_size":"64MB",
+				"innodb_buffer_pool_size":"128MB",
                 "port":6001
             },
             {
                 "ip":"192.168.0.3",
-				"innodb_buffer_pool_size":"64MB",
+				"innodb_buffer_pool_size":"128MB",
                 "port":6001
             }
         ]

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 klunstron_user=${1:-kunlun}
-klunstron_basedir=${2:-/kunlun}
+klunstron_basedir=${2:-/home/kunlun/klustron}
 
 for i in python git wget yum-utils sysvinit-tools libaio libaio-devel expect chrony
 do
@@ -22,9 +22,11 @@ systemctl stop firewalld
 systemctl disable firewalld
 systemctl enable chronyd
 systemctl start chronyd
+setenforce 0
 groupadd -g 1008 $klunstron_user 
 useradd  -u 1007 -g 1008 $klunstron_user
 echo 'kunlun#'|passwd  --stdin $klunstron_user
+sed -ri  's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 sed -ri '/Allow root to run any commands anywhere/a '${klunstron_user}'  ALL=(ALL)  NOPASSWD: ALL'  /etc/sudoers
 mkdir -p $klunstron_basedir
 chown -R $klunstron_user:$klunstron_user $klunstron_basedir
