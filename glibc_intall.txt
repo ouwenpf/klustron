@@ -20,7 +20,7 @@ make install
 echo -e '\nexport PATH=/usr/local/gcc-8.2.0/bin:$PATH\n' > /etc/profile.d/gcc.sh
 source /etc/profile.d/gcc.sh
 # 导出头文件
-[yy@localhost profile.d]$ sudo ln -sv /usr/local/gcc-8.2.0/include/ /usr/include/gcc
+sudo ln -sv /usr/local/gcc-8.2.0/include/ /usr/include/gcc
 
 
 

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+for i in `mysql   -S /data/mysql/mysql3306/tmp/mysql3306.sock  -e 'show databases;'|egrep -v 'information_schema|performance_schema|mysql|sys'|sed '1d'`
+
+do
+   for j in `mysql   -S /data/mysql/mysql3306/tmp/mysql3306.sock  -e "show tables from $i"|sed '1d'`
+   do
+   # 
+  ./ddl2kunlun-linux -host="172.16.0.100" -port="3306" -user="abc" -password="abc" -sourceType="mysql" -database="$i" -table="$j" > log/${i}_$j.sql
+        done
+done
+
+
+
