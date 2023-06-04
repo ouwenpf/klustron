@@ -36,7 +36,7 @@ ssh-keygen -t rsa -N '' -f $HOME/.ssh/id_rsa -q
 
 for i in $hosts
 do
-echo "...............$host.................."
+echo "...............$i.................."
 echo ''  $HOME/.ssh/known_hosts &>/dev/null
 expect <<EOF
 
@@ -58,7 +58,7 @@ done
 
 for k in $hosts
 do
-echo "...............$host.................."
+echo "...............$k.................."
 echo ''  $HOME/.ssh/known_hosts &>/dev/null
 expect <<EOF
 
