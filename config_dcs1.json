@@ -1,0 +1,175 @@
+{
+    "machines":[
+        {
+            "ip":"172.16.128.15",
+            "basedir":"/home/tanyueyun/mdcbase",
+            "user":"tanyueyun"
+        },
+        {
+            "ip":"172.16.128.16",
+	    "basedir":"/home/tanyueyun/mdcbase",
+            "user":"tanyueyun"
+        },
+        {
+            "ip":"172.16.128.17",
+            "basedir":"/home/tanyueyun/mdcbase",
+            "user":"tanyueyun"
+        },
+        {
+            "ip":"172.16.128.18",
+            "basedir":"/home/tanyueyun/mdcbase",
+            "user":"tanyueyun"
+        },
+        {
+            "ip":"172.16.128.19",
+	    "basedir":"/home/tanyueyun/mdcbase",
+            "user":"tanyueyun"
+        },
+        {
+            "ip":"172.16.128.20",
+            "basedir":"/home/tanyueyun/mdcbase",
+            "user":"tanyueyun"
+        },
+        {
+            "ip":"172.16.125.21",
+            "basedir":"/home/tanyueyun/mdcbase",
+            "user":"tanyueyun"
+        },
+        {
+            "ip":"172.16.125.22",
+	    "basedir":"/home/tanyueyun/mdcbase",
+            "user":"tanyueyun"
+        },
+        {
+            "ip":"172.16.125.23",
+            "basedir":"/home/tanyueyun/mdcbase",
+            "user":"tanyueyun"
+        }
+    ],
+    "datacenters": [
+	    {
+		    "name": "sz-dc1",
+		    "province": "guangdong",
+		    "city": "shenzhen",
+		    "is_primary": true
+	    },
+	    {
+		    "name": "sz-dc2",
+		    "province": "guangdong",
+		    "city": "shenzhen"
+	    },
+	    {
+		    "name": "gz-dc1",
+		    "province": "guangdong",
+		    "city": "guangzhou"
+	    }
+    ],
+    "meta":{
+	"ha_mode": "rbr",
+        "nodes":[
+ 		{
+ 		"ip":"172.16.128.15"
+                },
+                {
+ 		"ip":"172.16.128.16"
+                },
+                {
+ 		"ip":"172.16.128.18"
+                },
+ 		{
+ 		"ip":"172.16.128.19"
+                },
+                {
+ 		"ip":"172.16.125.21"
+                },
+                {
+ 		"ip":"172.16.125.22"
+                }
+        ]
+    },
+    "cluster_manager": {
+           "nodes": [
+		{
+ 		"ip": "172.16.128.15"
+		},
+		{
+ 		"ip": "172.16.128.16"
+		},
+		{
+ 		"ip": "172.16.128.18"
+		},
+		{
+ 		"ip": "172.16.128.19"
+		},
+		{
+ 		"ip": "172.16.125.21"
+		},
+		{
+ 		"ip": "172.16.125.22"
+		}
+	    ]	
+    },
+    "node_manager": {
+           "nodes": [
+		{
+ 		"ip": "172.16.128.15",
+		"dc": "sz-dc1"
+		},
+		{
+ 		"ip": "172.16.128.16",
+		"dc": "sz-dc1"
+		},
+		{ 
+ 		"ip": "172.16.128.17",
+		"dc": "sz-dc1"
+		},
+		{
+ 		"ip": "172.16.128.18",
+		"dc": "sz-dc2"
+		},
+		{
+ 		"ip": "172.16.128.19",
+		"dc": "sz-dc2"
+		},
+		{ 
+ 		"ip": "172.16.128.20",
+		"dc": "sz-dc2"
+		},
+		{
+ 		"ip": "172.16.125.21",
+		"dc": "gz-dc1"
+		},
+		{
+ 		"ip": "172.16.125.22",
+		"dc": "gz-dc1"
+		},
+		{ 
+ 		"ip": "172.16.125.23",
+		"dc": "gz-dc1"
+		}
+	    ]	
+    },
+    "xpanel": {
+	"image": "registry.cn-hangzhou.aliyuncs.com/kunlundb/kunlun-xpanel:1.2.1",
+	"nodes": [
+		{
+			"ip": "192.168.0.128",
+			"port":18081
+		},
+
+
+
+		{
+			"ip": "192.168.0.125",
+			"port":18081
+		}
+
+
+	]
+    }
+
+
+}    
+
+
+
