@@ -15,8 +15,20 @@ if [ `timedatectl|grep -c 'Asia/Shanghai'` -eq 0 ];then
 	timedatectl set-timezone Asia/Shanghai
 fi
 
-echo "*                -       nofile          200000" >>/etc/security/limits.conf
-echo "*                -       nproc           65535" >>/etc/security/limits.conf
+cat >> /etc/security/limits.conf << EOF
+*                soft    core          unlimited
+*                hard    core          unlimited
+*                soft    nproc         1000000
+*                hard    nproc         1000000
+*                soft    nofile        100000
+*                hard    nofile        100000
+*                soft    memlock       32000
+*                hard    memlock       32000
+*                soft    msgqueue      8192000
+*                hard    msgqueue      8192000
+EOF
+
+
 yum remove  -y  postfix mariadb-libs 
 systemctl stop firewalld
 systemctl disable firewalld
