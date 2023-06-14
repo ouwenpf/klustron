@@ -30,15 +30,16 @@ EOF
 
 
 yum remove  -y  postfix mariadb-libs 
+setenforce 0
+sed -ri  's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 systemctl stop firewalld
 systemctl disable firewalld
 systemctl enable chronyd
 systemctl start chronyd
-setenforce 0
-groupadd -g 1007 $klunstron_user 
-useradd  -u 1007 -g 1007 $klunstron_user
+#groupadd -g 1007 $klunstron_user 
+#useradd  -u 1007 -g 1007 $klunstron_user
+useradd  $klunstron_user
 echo 'kunlun#'|passwd  --stdin $klunstron_user
-sed -ri  's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 sed -ri '/Allow root to run any commands anywhere/a '${klunstron_user}'  ALL=(ALL)  NOPASSWD: ALL'  /etc/sudoers
 mkdir -p $klunstron_basedir
 chown -R $klunstron_user:$klunstron_user $klunstron_basedir
