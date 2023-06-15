@@ -1,18 +1,19 @@
 #!/bin/bash
 
-sshport=${1:-22}
+user=$1
 passwd=$2
-shift 2
+sshport=$3
+shift 3
 hosts=$*
 
-if [ $USER == "root" ];then
-		echo "Currently root user, unable to execute"
+if [ $user == "root" ];then
+		echo "Currently root user, unable to execute,Please switch to Kunlun user execution"
 		exit 
 
 fi
 
 if [ $# -lt 1 ];then
-	echo "Usage:  port passwd ip_list......"
+	echo "Usage:  user passwd port ip_list......"
 	exit 
 fi
 
@@ -40,7 +41,7 @@ echo "...............$i.................."
 echo ''  $HOME/.ssh/known_hosts &>/dev/null
 expect <<EOF
 
-	spawn ssh-copy-id -f -p$sshport $USER@$i
+	spawn ssh-copy-id -f -p$sshport $user@$i
 	expect {
 		"yes/no" { send "yes\n"; exp_continue }
 		"password" { send "$passwd\n" }
@@ -62,7 +63,7 @@ echo "...............$k.................."
 echo ''  $HOME/.ssh/known_hosts &>/dev/null
 expect <<EOF
 
-	spawn  scp -P$sshport  -rp $HOME/.ssh/id_rsa  $HOME/.ssh/id_rsa.pub   $USER@$k:$HOME/.ssh 
+	spawn  scp -P$sshport  -rp $HOME/.ssh/id_rsa  $HOME/.ssh/id_rsa.pub   $user@$k:/home/$user/.ssh 
 	expect {
 		"yes/no" { send "yes\n"; exp_continue }
 		"password" { send "$passwd\n" }
@@ -81,7 +82,7 @@ datefile=$(date +%Y%m%d%H%M%S).log
 
 for j in $hosts
 do
-ssh -p$sshport $j  echo $(date +%Y%m%d%H%M%S)   >> $datefile
+ssh -p$sshport $user@$j  echo $(date +%Y%m%d%H%M%S)   >> $datefile
 
 
 done

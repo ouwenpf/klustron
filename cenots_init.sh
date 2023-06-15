@@ -1,7 +1,17 @@
 #!/bin/bash
 
-klunstron_user=${1:-kunlun}
-klunstron_basedir=${2:-/home/kunlun/klustron}
+#klunstron_user=${1:-kunlun}
+#klunstron_basedir=${2:-/home/kunlun/klustron}
+klunstron_user=$1
+klunstron_basedir=$2
+
+if [ $# -ne 2 ];then
+	echo "Usage:  please input klunstron_user and klunstron_basedir"
+	exit 
+fi
+
+
+
 
 for i in python git wget yum-utils sysvinit-tools libaio libaio-devel expect chrony
 do
