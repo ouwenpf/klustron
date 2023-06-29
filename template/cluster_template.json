@@ -119,6 +119,6 @@
     "xpanel":{
         "ip":"192.168.0.1",
         "port":18080,
-        "image":"registry.cn-hangzhou.aliyuncs.com/kunlundb/kunlun-xpanel:1.2.1"
+        "image":"registry.cn-hangzhou.aliyuncs.com/kunlundb/kunlun-xpanel:VERSION"
     }
 }
