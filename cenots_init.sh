@@ -5,15 +5,25 @@
 klunstron_user=$1
 klunstron_basedir=$2
 
-if [[  -f /etc/rc.d/init.d/functions ]];then
-	. /etc/rc.d/init.d/functions
+if [ `ping 8.8.8.8 -c 3 | grep "min/avg/max" -c` = '1' ]; then
 
-else 
-	yum install -y initscripts  &>/dev/null   &\
-	. /etc/rc.d/init.d/functions
-    # success failure
+	if [[  -f /etc/rc.d/init.d/functions ]];then
+		. /etc/rc.d/init.d/functions
+
+	else 
+		yum install -y initscripts  &>/dev/null   &&\
+		. /etc/rc.d/init.d/functions
+		# success failure
 	
+	fi 
+	
+	else
+		echo "No network"  
+		exit
+
 fi 
+
+
 
 
 if [ $# -ne 2 ];then
