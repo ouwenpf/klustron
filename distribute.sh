@@ -44,7 +44,7 @@ echo "...............$i.................."
 echo "Upload files  ${file_name} to $i"
 expect <<EOF
 
-	spawn  scp -P$sshport  -rp ${file_name}   $user@$i:/$user
+	spawn  scp -P$sshport  -rp ${file_name}   $user@$i:~
 	expect {
 		"yes/no" { send "yes\n"; exp_continue }
 		"password" { send "$passwd\n" }
@@ -65,7 +65,7 @@ echo "...............$k.................."
 echo "Run script ${file_name} on $k"
 expect <<EOF
 
-	spawn  ssh -p$sshport  $user@$k   "test -f  /root/${file_name}  && sh /root/${file_name} kunlun /home/kunlun/klustron"
+	spawn  ssh -p$sshport  $user@$k   "test -f  ~/${file_name}  && sh ~/${file_name} kunlun /home/kunlun/klustron"
 	expect {
 		"yes/no" { send "yes\n"; exp_continue }
 		"password" { send "$passwd\n" }
