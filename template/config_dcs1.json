@@ -7,7 +7,7 @@
         },
         {
             "ip":"192.168.0.176",
-            "basedir":"/home/tanyueyun/mdcbase",
+	          "basedir":"/home/tanyueyun/mdcbase",
             "user":"tanyueyun"
         },
         {
@@ -22,7 +22,7 @@
         },
         {
             "ip":"192.168.0.185",
-            "basedir":"/home/tanyueyun/mdcbase",
+	          "basedir":"/home/tanyueyun/mdcbase",
             "user":"tanyueyun"
         },
         {
@@ -37,7 +37,7 @@
         },
         {
             "ip":"172.16.128.16",
-            "basedir":"/home/tanyueyun/mdcbase",
+	          "basedir":"/home/tanyueyun/mdcbase",
             "user":"tanyueyun"
         },
         {
@@ -46,226 +46,236 @@
             "user":"tanyueyun"
         }
     ],
+    
     "datacenters": [
-       {
-            "name": "sz-dc1",
-            "province": "guangdong",
-            "city": "shenzhen",
-            "is_primary": true
-       },
-       {
-            "name": "sz-dc2",
-            "province": "guangdong",
-            "city": "shenzhen"
-       },
-       {
-            "name": "bj-dc1",
-            "province": "beijing",
-            "city": "beijing"
-       }
+	    {
+		    "name": "sz-dc1",
+		    "province": "guangdong",
+		    "city": "shenzhen",
+		    "is_primary": true
+	    },
+	    {
+		    "name": "sz-dc2",
+		    "province": "guangdong",
+		    "city": "shenzhen"
+	    },
+	    {
+		    "name": "bj-dc1",
+		    "province": "beijing",
+		    "city": "beijing"
+	    }
     ],
+    
     "meta":{
-        "ha_mode": "rbr",
-        "nodes":[
-        {
-           "ip":"192.168.0.174",
-           "innodb_buffer_pool_size":"1024MB",
-           "port":6001
+	  "ha_mode": "rbr",
+ 		"config":{
+    
+		    "innodb_buffer_pool_size":"1024MB",
+		    "innodb_page_size":16384,
+		    "max_binlog_size": 1073741824,
+		    "lock_wait_timeout":1200,
+		    "innodb_lock_wait_timeout":1200      
         },
-
-        {
-           "ip":"192.168.0.176",
-           "innodb_buffer_pool_size":"1024MB",
-           "port":6001
-         },
-
-        {
-           "ip":"192.168.0.184",
-           "innodb_buffer_pool_size":"1024MB",
-           "port":6001
-         },
-
-           {
-           "ip":"192.168.0.185",
-           "innodb_buffer_pool_size":"1024MB",
-           "port":6001
-        },
-
-        {
-           "ip":"172.16.128.15",
-           "innodb_buffer_pool_size":"1024MB",
-           "port":6001
-        },
-
-        {
-           "ip":"172.16.128.16",
-           "innodb_buffer_pool_size":"1024MB",
-           "port":6001
-        },
-
-        {
-          "ip":"172.16.128.17",
-          "innodb_buffer_pool_size":"1024MB",
-          "port":6001
-        }
-        ]
-    },
-    "cluster_manager": {
-        "nodes": [
-         {
-           "ip": "192.168.0.174",
-           "brpc_http_port":58000,
-		   "brpc_raft_port":58001,
-		   "prometheus_port_start":59010
-         },
-         {
-          "ip": "192.168.0.176",
-          "brpc_http_port":58000,
-          "brpc_raft_port":58001,
-          "prometheus_port_start":59010
-         },
-         {
-           "ip": "192.168.0.184",
-           "brpc_http_port":58000,
-           "brpc_raft_port":58001,
-           "prometheus_port_start":59010
-         },
-         {
-          "ip": "192.168.0.185",
-          "brpc_http_port":58000,
-          "brpc_raft_port":58001,
-          "prometheus_port_start":59010
-         },
-         {
-           "ip": "172.16.128.15",
-           "brpc_http_port":58000,
-           "brpc_raft_port":58001,
-           "prometheus_port_start":59010
-         },
-         {
-            "ip": "172.16.128.16",
-            "brpc_http_port":58000,
-			"brpc_raft_port":58001,
-			"prometheus_port_start":59010
-         },
-
-         {
-            "ip": "172.16.128.17",
-            "brpc_http_port":58000,
-            "brpc_raft_port":58001,
-            "prometheus_port_start":59010
-         }
-
-        ]
-    },
-    "node_manager": {
-           "nodes": [
-      {
-        "ip": "192.168.0.174",
-        "brpc_http_port":58002,
-        "tcp_port":58003,
-        "prometheus_port_start":58010,
-        "storage_portrange": "57000-58000",
-        "server_portrange": "47000-48000",
-        "dc": "sz-dc1"
-      },
-      {
-        "ip": "192.168.0.176",
-        "brpc_http_port":58002,
-        "tcp_port":58003,
-        "prometheus_port_start":58010,
-        "storage_portrange": "57000-58000",
-        "server_portrange": "47000-48000",
-        "dc": "sz-dc1"
-      },
-      {
-         "ip": "192.168.0.177",
-         "brpc_http_port":58002,
-         "tcp_port":58003,
-         "prometheus_port_start":58010,
-         "storage_portrange": "57000-58000",
-         "server_portrange": "47000-48000",
-         "dc": "sz-dc1"
-      },
-      {
-         "ip": "192.168.0.184",
-         "brpc_http_port":58002,
-         "tcp_port":58003,
-         "prometheus_port_start":58010,
-         "storage_portrange": "57000-58000",
-         "server_portrange": "47000-48000",
-         "dc": "sz-dc2"
-       },
-       {
-           "ip": "192.168.0.185",
-           "brpc_http_port":58002,
-           "tcp_port":58003,
-           "prometheus_port_start":58010,
-           "storage_portrange": "57000-58000",
-           "server_portrange": "47000-48000",
-           "dc": "sz-dc2"
-        },
-        {
-           "ip": "192.168.0.186",
-           "brpc_http_port":58002,
-           "tcp_port":58003,
-           "prometheus_port_start":58010,
-           "storage_portrange": "57000-58000",
-           "server_portrange": "47000-48000",
-           "dc": "sz-dc2"
-        },
-        {
-           "ip": "172.16.128.15",
-           "brpc_http_port":58002,
-           "tcp_port":58003,
-           "prometheus_port_start":58010,
-           "storage_portrange": "57000-58000",
-           "server_portrange": "47000-48000",
-           "dc": "bj-dc1"
-        },
-        {
-           "ip": "172.16.128.16",
-           "brpc_http_port":58002,
-		   "tcp_port":58003,
-		   "prometheus_port_start":58010,
-           "storage_portrange": "57000-58000",
-           "server_portrange": "47000-48000",
-           "dc": "bj-dc1"
-        },
-        {
-	      "ip": "172.16.128.17",
-	      "brpc_http_port":58002,
-	      "tcp_port":58003,
-	      "prometheus_port_start":58010,
-	      "storage_portrange": "57000-58000",
-	      "server_portrange": "47000-48000",
-	      "dc": "bj-dc1"
-        }
-      ]
-    },
-    "xpanel": {
-        "image": "registry.cn-hangzhou.aliyuncs.com/kunlundb/kunlun-xpanel:VERSION",
-        "nodes": [
-        {
-           "ip": "192.168.0.128",
-           "port":18081
+  
+   "nodes":[
+ 		    {
+ 		"ip":"192.168.0.174",
+		"port":6001
         },
 		
+        {
+ 		"ip":"192.168.0.176",
+		"port":6001
+         },
+		 
+        {
+ 		"ip":"192.168.0.184",
+		"port":6001
+         },
+		 
+ 		    {
+ 		"ip":"192.168.0.185",
+		"port":6001
+        },
+		 
+        {
+ 		"ip":"172.16.128.15",
+		"port":6001
+        },
+		
+        {
+ 		"ip":"172.16.128.16",
+		"port":6001
+        },
+		
+		    {
+ 		"ip":"172.16.128.17",
+		"port":6001
+        }
+        ]
+        },
+        
+    "cluster_manager": {
+    "nodes": [
+		{
+     "ip": "192.168.0.174",
+     "brpc_http_port":58000,
+     "brpc_raft_port":58001,
+     "prometheus_port_start":59010
+		},
+		{
+      "ip": "192.168.0.176",
+      "brpc_http_port":58000,
+      "brpc_raft_port":58001,
+      "prometheus_port_start":59010
+		},
+		{
+      "ip": "192.168.0.184",
+      "brpc_http_port":58000,
+      "brpc_raft_port":58001,
+      "prometheus_port_start":59010
+		},
+		{
+ 		  "ip": "192.168.0.185",
+		  "brpc_http_port":58000,
+      "brpc_raft_port":58001,
+      "prometheus_port_start":59010
+		},
+		{
+      "ip": "172.16.128.15",
+      "brpc_http_port":58000,
+      "brpc_raft_port":58001,
+      "prometheus_port_start":59010
+		},
+		{
+ 		   "ip": "172.16.128.16",
+	     "brpc_http_port":58000,
+       "brpc_raft_port":58001,
+       "prometheus_port_start":59010
+		},
+		
+		{
+      "ip": "172.16.128.17",
+      "brpc_http_port":58000,
+      "brpc_raft_port":58001,
+      "prometheus_port_start":59010
+		}
+		
+    ]	
+    },
+    
+    "node_manager": {
+    "nodes": [
+		{
+ 		    "ip": "192.168.0.174",
+		    "brpc_http_port":58002,
+        "tcp_port":58003,
+        "prometheus_port_start":58010,
+		    "storage_portrange": "57000-58000",
+		    "server_portrange": "47000-48000",
+		    "dc": "sz-dc1"
+		},
+		{
+ 	    	"ip": "192.168.0.176",
+		    "brpc_http_port":58002,
+        "tcp_port":58003,
+        "prometheus_port_start":58010,
+		    "storage_portrange": "57000-58000",
+		    "server_portrange": "47000-48000",
+		    "dc": "sz-dc1"
+		},
+		{ 
+ 		    "ip": "192.168.0.177",
+		    "brpc_http_port":58002,
+        "tcp_port":58003,
+        "prometheus_port_start":58010,
+		    "storage_portrange": "57000-58000",
+		    "server_portrange": "47000-48000",
+		    "dc": "sz-dc1"
+		},
+		{
+ 		    "ip": "192.168.0.184",
+		    "brpc_http_port":58002,
+        "tcp_port":58003,
+        "prometheus_port_start":58010,
+        "storage_portrange": "57000-58000",
+		    "server_portrange": "47000-48000",
+		    "dc": "sz-dc2"
+		},
+		{
+ 		    "ip": "192.168.0.185",
+		    "brpc_http_port":58002,
+        "tcp_port":58003,
+        "prometheus_port_start":58010,
+		    "storage_portrange": "57000-58000",
+		    "server_portrange": "47000-48000",
+		    "dc": "sz-dc2"
+		},
+		{ 
+ 		    "ip": "192.168.0.186",
+		    "brpc_http_port":58002,
+        "tcp_port":58003,
+        "prometheus_port_start":58010,
+		    "storage_portrange": "57000-58000",
+		    "server_portrange": "47000-48000",
+		    "dc": "sz-dc2"
+		},
+		{
+ 		    "ip": "172.16.128.15",
+		    "brpc_http_port":58002,
+        "tcp_port":58003,
+        "prometheus_port_start":58010,
+		    "storage_portrange": "57000-58000",
+		    "server_portrange": "47000-48000",
+       	"dc": "bj-dc1"
+		},
+		{
+ 		    "ip": "172.16.128.16",
+		    "brpc_http_port":58002,
+        "tcp_port":58003,
+        "prometheus_port_start":58010,
+		    "storage_portrange": "57000-58000",
+		    "server_portrange": "47000-48000",
+		    "dc": "bj-dc1"
+		},
+		{ 
+ 		    "ip": "172.16.128.17",
+		    "brpc_http_port":58002,
+        "tcp_port":58003,
+        "prometheus_port_start":58010,
+		    "storage_portrange": "57000-58000",
+		    "server_portrange": "47000-48000",
+		    "dc": "bj-dc1"
+		}
+    ]	
+    },
+    
+    
+    "xpanel": {
+	  "image": "registry.cn-hangzhou.aliyuncs.com/kunlundb/kunlun-xpanel:VERSION",
+	  "nodes": [
+		{
+			"ip": "192.168.0.128",
+			"port":18081
+		},
+
 	   {
 	       "ip": "192.168.0.127",
 	       "port":18081
 	   },
 
-        {
-           "ip": "192.168.0.125",
-           "port":18081
-        }
+		{
+			"ip": "192.168.0.125",
+			"port":18081
+		}
 
 
-        ]
+	]
     }
 
 
-}
+}    
+
+
 
 

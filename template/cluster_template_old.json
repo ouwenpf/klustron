@@ -21,24 +21,20 @@
     ],
     "meta":{
         "ha_mode":"rbr",
-		"config":{
-			"innodb_buffer_pool_size":"1024MB",
-			"innodb_page_size":16384,
-			"max_binlog_size": 1073741824,
-			"lock_wait_timeout":1200,
-			"innodb_lock_wait_timeout":1200
-		},
         "nodes":[
             {
                 "ip":"192.168.0.1",
+				"innodb_buffer_pool_size":"1024MB",
                 "port":6001
             },
             {
                 "ip":"192.168.0.2",
+				"innodb_buffer_pool_size":"1024MB",
                 "port":6001
             },
             {
                 "ip":"192.168.0.3",
+				"innodb_buffer_pool_size":"1024MB",
                 "port":6001
             }
         ]
@@ -95,6 +91,30 @@
             }
         ]
     },
+	"backup":{
+		"hdfs":[
+				{
+                "ip":"127.0.0.1",
+                "port":9200
+	            }
+			   ],
+		"ssh":[
+			{
+			"ip":"127.0.0.1",
+			"port":22,
+			"user":"kunlun",
+			"targetDir":"/data/backup"
+			}
+			]   
+	     },
+		 
+	
+	 "elasticsearch": {
+      "ip": "192.168.0.111",
+	  "port":9200,
+	  "kibana_prot":5601
+    },
+	
 	
     "xpanel":{
         "ip":"192.168.0.1",
