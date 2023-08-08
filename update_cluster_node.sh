@@ -60,13 +60,7 @@ else
 	user_list=($(jq  '.machines[].user'  $config_json |xargs))
 	basedir_list=($(jq  '.machines[].basedir'  $config_json |xargs))
 	sshport_list=($(jq  '.machines[].sshport'  $config_json |xargs))
-	
-	
-	echo ${ip_list[*]}
-	echo ${user_list[*]}
-	echo ${basedir_list[*]}
-  echo ${sshport_list[*]}
-	
+
 fi
 
 
@@ -96,7 +90,7 @@ fi
 
 
 if [[ -s clustermgr/kunlun-cluster-manager-$VERSION.tgz ]];then
-	cd clustermgr &&  tar xf kunlun-cluster-manager-$VERSION.tgz 
+	cd clustermgr &&  tar xf kunlun-cluster-manager-$VERSION.tgz && cd ../
 else
 	
    echo -e "$COL_START${RED}请检查kunlun-cluster-manager-$VERSION.tgz文件是否完整和存在$COL_END"
@@ -106,7 +100,7 @@ fi
 
 
 if [[ -s clustermgr/kunlun-node-manager-$VERSION.tgz ]];then
-	cd clustermgr &&  tar xf kunlun-node-manager-$VERSION.tgz 
+	cd clustermgr &&  tar xf kunlun-node-manager-$VERSION.tgz && cd ../
 else
 	
    echo -e "$COL_START${RED}请检查kunlun-node-manager-$VERSION.tgz文件是否完整和存在$COL_END"
@@ -143,7 +137,7 @@ restart_cluster_mgr(){
     if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "test -d ${basedir_list[$i]}/kunlun-cluster-manager-$VERSION";then
       for j in `seq 1 30`
       do
-        ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps xua | grep cluster_mgr | grep -v grep | awk '\''{print "kill -9",$2}'\'' | bash' 
+        ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps xua | egrep -w cluster_mgr | grep -v grep | awk '\''{print "kill -9",$2}'\'' | bash' 
       done
         ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "cd ${basedir_list[$i]}/kunlun-cluster-manager-$VERSION/bin && ./start_cluster_mgr.sh" &>/dev/null
         if [[ $? -eq 0 ]];then
@@ -159,6 +153,48 @@ restart_cluster_mgr(){
 }
 
 
+
+
+
+update_cluster_mgr(){
+
+	echo -e "$COL_START${RED}update_cluster_mgr...$COL_END"
+  download_software
+ #VERSION=$(ls kunlun-node-manager-*gz|awk -F '-'  '{print $4}'|cut -c  1-5)
+	for i in $(seq 0 $((${#ip_list[*]}-1)))
+	do
+    if [[ "${user_list[$i]}" == "null" ]];then
+      user_list[$i]="kunlun"
+    fi 
+   
+    if [[ "${basedir_list[$i]}" == "null" ]];then
+      basedir_list[$i]="/kunlun"
+      
+    fi
+ 
+    if [[ "${sshport_list[$i]}" == "null" ]];then
+      sshport_list[$i]=22
+    fi
+	    
+    if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "test -d ${basedir_list[$i]}/kunlun-cluster-manager-$VERSION";then
+      for j in `seq 1 30`
+      do
+        ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps xua | egrep -w cluster_mgr| grep -v grep | awk '\''{print "kill -9",$2}'\'' | bash' 
+      done
+        scp -rp -P${sshport_list[$i]} clustermgr/kunlun-cluster-manager-$VERSION.tgz ${user_list[$i]}@${ip_list[$i]}:${basedir_list[$i]} &>/dev/null &&\
+        scp -rp -P${sshport_list[$i]} clustermgr/kunlun-cluster-manager-$VERSION/bin ${user_list[$i]}@${ip_list[$i]}:${basedir_list[$i]}/kunlun-cluster-manager-$VERSION/  &>/dev/null
+        ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "cd ${basedir_list[$i]}/kunlun-cluster-manager-$VERSION/bin && ./start_cluster_mgr.sh" &>/dev/null
+        if [[ $? -eq 0 ]];then
+          echo -e "$COL_START${GREEN}${ip_list[$i]}主机cluster_mgr更新成功$COL_END"
+        else
+          echo -e "$COL_START${GREEN}${ip_list[$i]}主机cluster_mgr更新失败$COL_END"
+        fi
+    fi
+	done
+
+
+
+}
 
 
 
@@ -191,7 +227,7 @@ restart_node_mgr(){
     if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "test -d ${basedir_list[$i]}/kunlun-node-manager-$VERSION";then
       for j in `seq 1 30`
       do
-        ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps xua | grep node_mgr | grep -v grep | awk '\''{print "kill -9",$2}'\'' | bash' 
+        ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps xua | egrep -w node_mgr | grep -v grep | awk '\''{print "kill -9",$2}'\'' | bash' 
       done
         ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "cd ${basedir_list[$i]}/kunlun-node-manager-$VERSION/bin && ./start_node_mgr.sh" &>/dev/null
         if [[ $? -eq 0 ]];then
@@ -204,11 +240,51 @@ restart_node_mgr(){
 
 
 
+}
+
+
+
+
+
+update_node_mgr(){
+
+	echo -e "$COL_START${RED}update_node_mgr...$COL_END"
+  download_software
+ #VERSION=$(ls kunlun-node-manager-*gz|awk -F '-'  '{print $4}'|cut -c  1-5)
+	for i in $(seq 0 $((${#ip_list[*]}-1)))
+	do
+    if [[ "${user_list[$i]}" == "null" ]];then
+      user_list[$i]="kunlun"
+    fi 
+   
+    if [[ "${basedir_list[$i]}" == "null" ]];then
+      basedir_list[$i]="/kunlun"
+      
+    fi
+ 
+    if [[ "${sshport_list[$i]}" == "null" ]];then
+      sshport_list[$i]=22
+    fi
+	    
+    if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "test -d ${basedir_list[$i]}/kunlun-node-manager-$VERSION";then
+      for j in `seq 1 30`
+      do
+        ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps xua | egrep -w node_mgr | grep -v grep | awk '\''{print "kill -9",$2}'\'' | bash' 
+      done
+        scp -rp -P${sshport_list[$i]} clustermgr/kunlun-node-manager-$VERSION.tgz ${user_list[$i]}@${ip_list[$i]}:${basedir_list[$i]} &>/dev/null &&\
+        scp -rp -P${sshport_list[$i]} clustermgr/kunlun-node-manager-$VERSION/bin ${user_list[$i]}@${ip_list[$i]}:${basedir_list[$i]}/kunlun-node-manager-$VERSION/  &>/dev/null
+        ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "cd ${basedir_list[$i]}/kunlun-node-manager-$VERSION/bin && ./start_node_mgr.sh" &>/dev/null
+        if [[ $? -eq 0 ]];then
+          echo -e "$COL_START${GREEN}${ip_list[$i]}主机node_mgr更新成功$COL_END"
+        else
+          echo -e "$COL_START${GREEN}${ip_list[$i]}主机node_mgr更新失败$COL_END"
+        fi
+    fi
+	done
 
 
 
 }
-
 
 
 
@@ -228,11 +304,9 @@ Welcome to the Klusteron component update system
 
 2. restart_node_mgr
  
-3. 
+3. update cluster_mgr
 
-4. 
-
-5. restart node_mgr &&  cluster_mgr   \e[0m\e[31m 
+4. update node_mgr    \e[0m\e[31m 
 ------------------------------------------------------\e[0m"
 
 read  -t 300 -p "请输入操作序号: "   oper_id
@@ -245,6 +319,15 @@ case $oper_id in
 2)
 	restart_node_mgr
 	;;
+
+3)
+	update_cluster_mgr
+	;;
+
+4)
+	update_node_mgr
+	;;
+
 
 *) 
 	echo "请输入正确的更新序号"
