@@ -102,8 +102,8 @@ cat >> /etc/security/limits.conf << EOF
 *                hard    core          unlimited
 *                soft    nproc         1000000
 *                hard    nproc         1000000
-*                soft    nofile        100000
-*                hard    nofile        100000
+*                soft    nofile        200000
+*                hard    nofile        200000
 *                soft    memlock       32000
 *                hard    memlock       32000
 *                soft    msgqueue      8192000

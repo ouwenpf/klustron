@@ -11,24 +11,10 @@ VERSION=1.2.1
 if [[ ! -s $config_json ]]  ||  [[ $# -ne 1 ]]; then
 	echo -e "$COL_START${RED}Usage $0 args file_json $COL_END"
   exit
-
-elif ! jq  '.'  $config_json &>/dev/null;then
-  echo -e "$COL_START$RED$config_json syntax error$COL_END"
-  exit 
-
+  
 elif ! ping -c3 8.8.8.8  &>/dev/null ;then   
   echo  -e "$COL_START$RED当前主机网络异常$COL_END"
   exit
-
-elif [[ $(echo `pwd`|grep 'cloudnative/cluster$'|wc -l)  -ne 1 ]]; then
-	echo  -e "$COL_START$RED请确保当前$0脚本在../cloudnative/cluster目录下 $COL_END"
-	exit 
-
-  
-elif ! jq  '.machines[].user'  $config_json |sed 's/null/"kunlun"/g'|sort -rn|uniq|egrep   -wq  "$USER";then
-  echo -e  "$COL_START$RED$config_json中不存在用户:$USER,请到对应的用户下执行脚本$COL_END"
-  exit  
-
 
 elif ! command -v jq &>/dev/null  ;then
   echo  -e "$COL_START$RED正在下载jq命令 $COL_END"
@@ -55,6 +41,20 @@ elif ! command -v jq &>/dev/null  ;then
 	    exit
   fi
   
+
+elif ! jq  '.'  $config_json &>/dev/null;then
+  echo -e "$COL_START$RED$config_json syntax error$COL_END"
+  exit 
+
+elif [[ $(echo `pwd`|grep 'cloudnative/cluster$'|wc -l)  -ne 1 ]]; then
+	echo  -e "$COL_START$RED请确保当前$0脚本在../cloudnative/cluster目录下 $COL_END"
+	exit 
+
+elif ! jq  '.machines[].user'  $config_json |sed 's/null/"kunlun"/g'|sort -rn|uniq|egrep   -wq  "$USER";then
+  echo -e  "$COL_START$RED$config_json中不存在用户:$USER,请到对应的用户下执行脚本$COL_END"
+  exit  
+
+
 else
 	ip_list=($(jq  '.machines[].ip'  $config_json |xargs))
 	user_list=($(jq  '.machines[].user'  $config_json |xargs))
