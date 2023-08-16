@@ -322,19 +322,31 @@ update_xpanel(){
       echo -e "$COL_START${RED}主机${xpanel_ip[$i]}:${sshport_list[$i]}有异常$COL_END" 
       continue  
     fi
+    
    
    if ssh -p${sshport_list[$i]} ${user_list[$i]}@${xpanel_ip[$i]} "sudo docker info >/dev/null";then
-     
-       #echo "ssh -p${sshport_list[$i]} ${user_list[$i]}@${xpanel_ip[$i]} \"sudo docker container rm -f xpanel_${xpanel_port[$i]} && sudo docker image rm -f registry.cn-hangzhou.aliyuncs.com/kunlundb/kunlun-xpanel:$VERSION\" "
-       network_mode_list=($(ssh -p${sshport_list[$i]} ${user_list[$i]}@${xpanel_ip[$i]} "sudo docker network ls | egrep -v 'none|host' | awk '{print \$2}' | sed '1d' | sed 's#[[:space:]]##g' | awk '{sub(/-/,\"_\"); print NR\".\"\$0}'"))
-       network_mode
+       network_mode_list=($(ssh -p${sshport_list[$i]} ${user_list[$i]}@${xpanel_ip[$i]} "sudo docker network ls | egrep -v 'none|host' | awk '{print \$2}' | sed '1d' | sed 's#[[:space:]]##g' | awk '{print NR\".\"\$0}'"))
+       install_xpanel=$(egrep -w "xpanel_${xpanel_port[$i]}" clustermgr/install.sh |awk -F ';' 'NR==1{print $2}'|awk -F '"' '{print $1}')
+       install_xpanel_mdc=$(egrep -w "xpanel_${xpanel_port[$i]}" clustermgr/install.sh |awk -F ";" '{print $2}'|awk -F '"' '{print $1}'|sort -rn|uniq |sed 's#--restart=always#--network '$docker_network'  --restart=always#g')
+    
+       if [[ ${#network_mode_list[*]} -eq 1 ]];then
+         ssh -p${sshport_list[$i]} ${user_list[$i]}@${xpanel_ip[$i]} "sudo docker container rm -f xpanel_${xpanel_port[$i]} &>/dev/null && sudo docker image rm -f registry.cn-hangzhou.aliyuncs.com/kunlundb/kunlun-xpanel:$VERSION &>/dev/null" &&\
+         ssh -p${sshport_list[$i]} ${user_list[$i]}@${xpanel_ip[$i]} "$install_xpanel &>/dev/null"
+         
+          if [[ $? -eq 0 ]];then
+            echo -e "$COL_START${GREEN}${xpanel_ip[$i]}主机:xpanel更新成功$COL_END"
+          else
+            echo -e "$COL_START${RED}${xpanel_ip[$i]}主机:xpanel更新失败$COL_END"
+          fi
 
-     else
+       else
+         network_mode
+       fi
+       
+       
+   else
        echo -e "$COL_START${RED}docker服务有异常$COL_END" 
        continue
-       
-     
-     
    fi
    
    
@@ -396,16 +408,25 @@ read  -t 300 -p "请输入操作序号: "   network_id
 
 if [[ $network_id =~ ^[0-9]+$ ]] && [[ $network_id -le "${#network_mode_list[*]}" ]]; then
     docker_network=$(echo "${network_mode_list[$(($network_id-1))]}"|sed 's#^[0-9].##g')
-    install_xpanel=$(egrep -w "xpanel_${xpanel_port[$i]}" clustermgr/install.sh |awk -F ';' 'NR==1{print $2}'|awk -F '"' '{print $1}')
-    install_xpanel_mdc=$(egrep -w "xpanel_${xpanel_port[$i]}" clustermgr/install.sh |awk -F ";" '{print $2}'|awk -F '"' '{print $1}'|sort -rn|uniq |sed 's#--restart=always#--network '$docker_network'  --restart=always#g')
+    
     
     if [[ "$docker_network" == "bridge" ]];then
-      ssh -p${sshport_list[$i]} ${user_list[$i]}@${xpanel_ip[$i]} "sudo docker container rm -f xpanel_${xpanel_port[$i]} && sudo docker image rm -f registry.cn-hangzhou.aliyuncs.com/kunlundb/kunlun-xpanel:$VERSION" &&\
-      ssh -p${sshport_list[$i]} ${user_list[$i]}@${xpanel_ip[$i]} "$install_xpanel"
+      ssh -p${sshport_list[$i]} ${user_list[$i]}@${xpanel_ip[$i]} "sudo docker container rm -f xpanel_${xpanel_port[$i]} &>/dev/null && sudo docker image rm -f registry.cn-hangzhou.aliyuncs.com/kunlundb/kunlun-xpanel:$VERSION &>/dev/null" &&\
+      ssh -p${sshport_list[$i]} ${user_list[$i]}@${xpanel_ip[$i]} "$install_xpanel &>/dev/null"
+      if [[ $? -eq 0 ]];then
+        echo -e "$COL_START${GREEN}${xpanel_ip[$i]}主机:xpanel更新成功$COL_END"
+      else
+        echo -e "$COL_START${RED}${xpanel_ip[$i]}主机:xpanel更新失败$COL_END"
+      fi
       
     else
-      ssh -p${sshport_list[$i]} ${user_list[$i]}@${xpanel_ip[$i]} "sudo docker container rm -f xpanel_${xpanel_port[$i]} && sudo docker image rm -f registry.cn-hangzhou.aliyuncs.com/kunlundb/kunlun-xpanel:$VERSION" &&\
-      ssh -p${sshport_list[$i]} ${user_list[$i]}@${xpanel_ip[$i]} "$install_xpanel_mdc"
+      ssh -p${sshport_list[$i]} ${user_list[$i]}@${xpanel_ip[$i]} "sudo docker container rm -f xpanel_${xpanel_port[$i]} &>/dev/null && sudo docker image rm -f registry.cn-hangzhou.aliyuncs.com/kunlundb/kunlun-xpanel:$VERSION &>/dev/null" &&\
+      ssh -p${sshport_list[$i]} ${user_list[$i]}@${xpanel_ip[$i]} "$install_xpanel_mdc &>/dev/null"
+      if [[ $? -eq 0 ]];then
+        echo -e "$COL_START${GREEN}${xpanel_ip[$i]}主机:xpanel更新成功$COL_END"
+      else
+        echo -e "$COL_START${RED}${xpanel_ip[$i]}主机:xpanel更新失败$COL_END"
+      fi
     
     fi
     
