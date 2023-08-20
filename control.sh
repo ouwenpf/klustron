@@ -8,6 +8,7 @@ VERSION=1.1.1
 install_docker(){
 #控制机上面执行,已经安装好docker就无需安装
 #yum remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine
+#yum -y install yum-utils
 yum-config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
 yum install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin device-mapper-persistent-data lvm2
 systemctl start docker

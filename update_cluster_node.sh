@@ -69,15 +69,32 @@ fi
 
 download_software(){
 
-if [[ -d clustermgr ]];then
-	cd  clustermgr &&\
-	rm -f kunlun-cluster-manager-$VERSION.tgz kunlun-node-manager-$VERSION.tgz
-	cd - 
-else 
-	echo -e "$COL_TTART${RED}clustermgr:No such file or directory$COL_END"
-	exit 
+if [[ $oper_id == 3 ]];then
+
+  if [[ -d clustermgr ]];then
+	  cd  clustermgr &&\
+	  rm -f kunlun-cluster-manager-$VERSION.tgz 
+	  cd - 
+  else 
+	  echo -e "$COL_TTART${RED}clustermgr:No such file or directory$COL_END"
+	  exit 
+  fi
+elif [[ $oper_id == 4 ]];then
+
+  if [[ -d clustermgr ]];then
+	  cd  clustermgr &&\
+	  rm -f kunlun-node-manager-$VERSION.tgz
+	  cd - 
+  else 
+	  echo -e "$COL_TTART${RED}clustermgr:No such file or directory$COL_END"
+	  exit     
+  fi
 
 fi
+
+
+
+
 
 
 if nc -z 192.168.0.104  14000 ;then
@@ -121,6 +138,7 @@ restart_cluster_mgr(){
 	echo -e "$COL_START${RED}restart_cluster_mgr...$COL_END"
   #download_software
  #VERSION=$(ls kunlun-node-manager-*gz|awk -F '-'  '{print $4}'|cut -c  1-5)
+ 
 	for i in $(seq 0 $((${#ip_list[*]}-1)))
 	do
     if [[ "${user_list[$i]}" == "null" ]];then
@@ -135,19 +153,50 @@ restart_cluster_mgr(){
     if [[ "${sshport_list[$i]}" == "null" ]];then
       sshport_list[$i]=22
     fi
+    
+        
+    
+    if ! nc -z  ${ip_list[$i]} ${sshport_list[$i]};then 
+      echo -e "$COL_START${RED}主机${ip_list[$i]}端口${sshport_list[$i]}有异常,无法连接,请检查网络$COL_END" 
+      continue  
+    fi
+    
+    
+    
 	    
-    if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "test -d ${basedir_list[$i]}/kunlun-cluster-manager-$VERSION";then
-      for j in `seq 1 30`
+      # stop_cluster_mgr
+      while true
       do
-        ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps xua | egrep -w cluster_mgr | grep -v grep | awk '\''{print "kill -9",$2}'\'' | bash' 
+        ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-cluster-manager-'"$VERSION"'" | grep -v grep | awk '\''{print "kill -9", $2}'\''|bash' 
+        
+        if ! ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-cluster-manager-'"$VERSION"'" | grep -v grep' ;then
+          break 
+        fi
+        
       done
+      
+      # start_cluster_mgr 
+      if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "test -s ${basedir_list[$i]}/kunlun-cluster-manager-$VERSION/bin/start_cluster_mgr.sh";then
+      
+      while true
+      do
         ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "cd ${basedir_list[$i]}/kunlun-cluster-manager-$VERSION/bin && ./start_cluster_mgr.sh" &>/dev/null
         if [[ $? -eq 0 ]];then
-          echo -e "$COL_START${GREEN}${ip_list[$i]}主机cluster_mgr重启成功$COL_END"
+        
+          if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-cluster-manager-'"$VERSION"'" | grep -vq grep' ;then
+            echo -e "$COL_START${GREEN}${ip_list[$i]}主机cluster_mgr重启成功$COL_END"
+            break 
+          fi
         else
-          echo -e "$COL_START${GREEN}${ip_list[$i]}主机cluster_mgr重启失败$COL_END"
+          echo -e "$COL_START${RED}${ip_list[$i]}主机cluster_mgr重启失败,请检查${ip_list[$i]}主机上是否安装有cluster_mgr$COL_END"
+          break
+          
         fi
+        
+      done
+       
     fi
+    
 	done
 
 
@@ -178,20 +227,68 @@ update_cluster_mgr(){
       sshport_list[$i]=22
     fi
 	    
-    if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "test -d ${basedir_list[$i]}/kunlun-cluster-manager-$VERSION";then
-      for j in `seq 1 30`
-      do
-        ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps xua | egrep -w cluster_mgr| grep -v grep | awk '\''{print "kill -9",$2}'\'' | bash' 
-      done
-        scp -rp -P${sshport_list[$i]} clustermgr/kunlun-cluster-manager-$VERSION.tgz ${user_list[$i]}@${ip_list[$i]}:${basedir_list[$i]} &>/dev/null &&\
-        scp -rp -P${sshport_list[$i]} clustermgr/kunlun-cluster-manager-$VERSION/bin ${user_list[$i]}@${ip_list[$i]}:${basedir_list[$i]}/kunlun-cluster-manager-$VERSION/  &>/dev/null
-        ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "cd ${basedir_list[$i]}/kunlun-cluster-manager-$VERSION/bin && ./start_cluster_mgr.sh" &>/dev/null
-        if [[ $? -eq 0 ]];then
-          echo -e "$COL_START${GREEN}${ip_list[$i]}主机cluster_mgr更新成功$COL_END"
-        else
-          echo -e "$COL_START${GREEN}${ip_list[$i]}主机cluster_mgr更新失败$COL_END"
-        fi
+    if ! nc -z  ${ip_list[$i]} ${sshport_list[$i]};then 
+      echo -e "$COL_START${RED}主机${ip_list[$i]}端口${sshport_list[$i]}有异常,无法连接,请检查网络$COL_END" 
+      continue  
     fi
+    
+    
+    
+    
+      # stop_cluster_mgr
+      while true
+      do
+        ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-cluster-manager-'"$VERSION"'" | grep -v grep | awk '\''{print "kill -9", $2}'\''|bash' 
+        
+        if ! ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-cluster-manager-'"$VERSION"'" | grep -v grep' ;then
+          break 
+        fi
+        
+      done
+      
+      
+
+      
+    
+    
+    # start_cluster_mgr   
+    if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "test -s ${basedir_list[$i]}/kunlun-cluster-manager-$VERSION/bin/start_cluster_mgr.sh";then
+    scp -rp -P${sshport_list[$i]} clustermgr/kunlun-cluster-manager-$VERSION.tgz ${user_list[$i]}@${ip_list[$i]}:${basedir_list[$i]} &>/dev/null &&\
+    scp -rp -P${sshport_list[$i]} clustermgr/kunlun-cluster-manager-$VERSION/bin ${user_list[$i]}@${ip_list[$i]}:${basedir_list[$i]}/kunlun-cluster-manager-$VERSION/  &>/dev/null 
+      if [[ $? -eq 0 ]];then
+      
+        while true
+        do
+          ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "cd ${basedir_list[$i]}/kunlun-cluster-manager-$VERSION/bin && ./start_cluster_mgr.sh" &>/dev/null
+          if [[ $? -eq 0 ]];then
+        
+            if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-cluster-manager-'"$VERSION"'" | grep -vq grep' ;then
+              echo -e "$COL_START${GREEN}${ip_list[$i]}主机cluster_mgr重启成功$COL_END"
+              break 
+            fi
+            
+          else
+            echo -e "$COL_START${RED}${ip_list[$i]}主机cluster_mgr重启失败,请检查${ip_list[$i]}主机上是否安装有cluster_mgr$COL_END"
+            break
+            
+            
+          fi
+          
+        done
+      
+    
+     else
+       echo '文件解压或覆盖失败'
+       exit
+    fi
+      
+      
+
+       
+   fi  
+        
+          
+        
 	done
 
 
@@ -225,19 +322,46 @@ restart_node_mgr(){
     if [[ "${sshport_list[$i]}" == "null" ]];then
       sshport_list[$i]=22
     fi
+    
+    if ! nc -z  ${ip_list[$i]} ${sshport_list[$i]};then 
+      echo -e "$COL_START${RED}主机${ip_list[$i]}端口${sshport_list[$i]}有异常,无法连接,请检查网络$COL_END" 
+      continue  
+    fi
+    
 	    
-    if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "test -d ${basedir_list[$i]}/kunlun-node-manager-$VERSION";then
-      for j in `seq 1 30`
+     # stop_node_mgr
+      while true
       do
-        ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps xua | egrep -w node_mgr | grep -v grep | awk '\''{print "kill -9",$2}'\'' | bash' 
+        ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-node-manager-'"$VERSION"'" | grep -v grep | awk '\''{print "kill -9", $2}'\''|bash' 
+        
+        if ! ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-node-manager-'"$VERSION"'" | grep -v grep' ;then
+          break 
+        fi
+        
       done
+      
+      # start_node_mgr 
+      if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "test -s ${basedir_list[$i]}/kunlun-node-manager-$VERSION/bin/start_node_mgr.sh";then
+      
+      while true
+      do
         ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "cd ${basedir_list[$i]}/kunlun-node-manager-$VERSION/bin && ./start_node_mgr.sh" &>/dev/null
         if [[ $? -eq 0 ]];then
-          echo -e "$COL_START${GREEN}${ip_list[$i]}主机node_mgr重启成功$COL_END"
+        
+          if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-node-manager-'"$VERSION"'" | grep -vq grep' ;then
+            echo -e "$COL_START${GREEN}${ip_list[$i]}主机node_mgr重启成功$COL_END"
+            break 
+          fi
         else
-          echo -e "$COL_START${GREEN}${ip_list[$i]}主机node_mgr重启失败$COL_END"
+          echo -e "$COL_START${RED}${ip_list[$i]}主机node_mgr重启失败,请检查${ip_list[$i]}主机上是否安装有node_mgr$COL_END"
+          break
+          
         fi
+        
+      done
+       
     fi
+    
 	done
 
 
@@ -267,23 +391,69 @@ update_node_mgr(){
     if [[ "${sshport_list[$i]}" == "null" ]];then
       sshport_list[$i]=22
     fi
-	    
-    if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "test -d ${basedir_list[$i]}/kunlun-node-manager-$VERSION";then
-      for j in `seq 1 30`
-      do
-        ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps xua | egrep -w node_mgr | grep -v grep | awk '\''{print "kill -9",$2}'\'' | bash' 
-      done
-        scp -rp -P${sshport_list[$i]} clustermgr/kunlun-node-manager-$VERSION.tgz ${user_list[$i]}@${ip_list[$i]}:${basedir_list[$i]} &>/dev/null &&\
-        scp -rp -P${sshport_list[$i]} clustermgr/kunlun-node-manager-$VERSION/bin ${user_list[$i]}@${ip_list[$i]}:${basedir_list[$i]}/kunlun-node-manager-$VERSION/  &>/dev/null
-        ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "cd ${basedir_list[$i]}/kunlun-node-manager-$VERSION/bin && ./start_node_mgr.sh" &>/dev/null
-        if [[ $? -eq 0 ]];then
-          echo -e "$COL_START${GREEN}${ip_list[$i]}主机node_mgr更新成功$COL_END"
-        else
-          echo -e "$COL_START${GREEN}${ip_list[$i]}主机node_mgr更新失败$COL_END"
-        fi
+    
+    
+    if ! nc -z  ${ip_list[$i]} ${sshport_list[$i]};then 
+      echo -e "$COL_START${RED}主机${ip_list[$i]}端口${sshport_list[$i]}有异常,无法连接,请检查网络$COL_END" 
+      continue  
     fi
-	done
+	    
+         
+      # stop_node_mgr
+      while true
+      do
+        ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-node-manager-'"$VERSION"'" | grep -v grep | awk '\''{print "kill -9", $2}'\''|bash' 
+        
+        if ! ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-node-manager-'"$VERSION"'" | grep -v grep' ;then
+          break 
+        fi
+        
+      done
+      
+      
 
+      
+    
+    
+    # start_node_mgr   
+    if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "test -s ${basedir_list[$i]}/kunlun-node-manager-$VERSION/bin/start_node_mgr.sh";then
+    scp -rp -P${sshport_list[$i]} clustermgr/kunlun-node-manager-$VERSION.tgz ${user_list[$i]}@${ip_list[$i]}:${basedir_list[$i]} &>/dev/null &&\
+    scp -rp -P${sshport_list[$i]} clustermgr/kunlun-node-manager-$VERSION/bin ${user_list[$i]}@${ip_list[$i]}:${basedir_list[$i]}/kunlun-node-manager-$VERSION/  &>/dev/null 
+      if [[ $? -eq 0 ]];then
+      
+        while true
+        do
+          ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "cd ${basedir_list[$i]}/kunlun-node-manager-$VERSION/bin && ./start_node_mgr.sh" &>/dev/null
+          if [[ $? -eq 0 ]];then
+        
+            if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-node-manager-'"$VERSION"'" | grep -vq grep' ;then
+              echo -e "$COL_START${GREEN}${ip_list[$i]}主机node_mgr重启成功$COL_END"
+              break 
+            fi
+            
+          else
+            echo -e "$COL_START${RED}${ip_list[$i]}主机node_mgr重启失败,请检查${ip_list[$i]}主机上是否安装有node_mgr$COL_END"
+            break
+            
+            
+          fi
+          
+        done
+      
+    
+     else
+       echo '文件解压或覆盖失败'
+       exit
+    fi
+      
+      
+
+       
+   fi  
+        
+          
+        
+	done
 
 
 }
@@ -391,7 +561,7 @@ fi
 
 done
 
-
+ 
 }
 
 
