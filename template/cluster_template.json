@@ -3,19 +3,19 @@
         {
             "ip":"192.168.0.1",
             "sshport":22,
-            "basedir":"/kunlun",
+            "basedir":"/home/kunlun/klustron",
             "user":"kunlun"
         },
         {
             "ip":"192.168.0.2",
             "sshport":22,
-            "basedir":"/kunlun",
+            "basedir":"/home/kunlun/klustron",
             "user":"kunlun"
         },
         {
             "ip":"192.168.0.3",
             "sshport":22,
-            "basedir":"/kunlun",
+            "basedir":"/home/kunlun/klustron",
             "user":"kunlun"
         }
     ],
@@ -31,15 +31,15 @@
         "nodes":[
             {
                 "ip":"192.168.0.1",
-                "port":6001
+                "port":56001
             },
             {
                 "ip":"192.168.0.2",
-                "port":6001
+                "port":56001
             },
             {
                 "ip":"192.168.0.3",
-                "port":6001
+                "port":56001
             }
         ]
     },
