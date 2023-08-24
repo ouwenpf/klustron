@@ -9,45 +9,25 @@ config_json=$1
 VERSION=1.2.1
 
 
-<<!
+#<<!
 
 if ! nc -z  www.kunlunbase.com  80  &>/dev/null ;then   
   echo  -e "$COL_START$RED当前主机网络异常$COL_END"
   exit
-fi
+
+
+elif ! sudo -v  &>/dev/null;then
+  echo -e "$COL_START$RED请使用root用户或具有root权限运行此脚本$COL_END"
 
 
 
-if [[ ! -d  /softwares   ]];then
+elif [[ ! -d  /softwares   ]];then
   sudo mkdir -p /softwares &>/dev/null  &&  cd /softwares &>/dev/null
   if [[ $? -ne 0 ]];then
-     echo -e "$COL_START$RED请使用root用户或具有root权限创建/softwares目录$COL_END"
+     echo -e "$COL_START$RED创建/softwares目失败录$COL_END"
      exit
   fi
     
-fi
-
-
-if [[ -d  /softwares/cloudnative   ]];then
-  echo -e "$COL_START$GREEN正在下载最新代码$COL_END"
-  cd /softwares  &&  sudo rm  -fr cloudnative &>/dev/null  &&  sudo git clone https://gitee.com/zettadb/cloudnative.git &>/dev/null
-  if [[ $? -eq 0 ]];then
-    echo -e "$COL_START$GREEN最新代码下载成功$COL_END"
-  else
-    echo -e "$COL_START$RED代码下载失败$COL_END"
-    exit
-  fi
-
-else
-  echo -e "$COL_START$GREEN正在下载最新代码$COL_END"
-  cd /softwares &&  sudo git clone https://gitee.com/zettadb/cloudnative.git  &>/dev/null
-  if [[ $? -eq 0 ]];then
-    echo -e "$COL_START$GREEN最新代码下载成功$COL_END"
-  else 
-    echo -e "$COL_START$RED代码下载失败$COL_END"
-    exit
-  fi
-
 fi
 
 
@@ -60,11 +40,11 @@ if ! command -v figlet &>/dev/null  ;then
     
       if [[ "$ID" == "ubuntu" ]]; then
         echo  -e "$COL_START${GREEN}OS is Ubuntu$COL_END"
-        sudo apt-get install -y figlet   &>/dev/null  
+        sudo apt-get install -y figlet expect  &>/dev/null  
         
       elif [[ "$ID" == "centos" ]]; then
         echo  -e "$COL_START${GREEN}OS is CentOS$COL_END"
-        sudo yum install -y figlet  &>/dev/null  
+        sudo yum install -y figlet expect &>/dev/null  
         
       else
         echo  -e "$COL_START$RED未知系统$COL_END"
@@ -82,7 +62,39 @@ if ! command -v figlet &>/dev/null  ;then
 fi
 
 
-!
+
+
+
+
+
+if [[ -d  /softwares/cloudnative   ]];then
+  echo -e "$COL_START$GREEN正在下载最新代码$COL_END"
+  cd /softwares  &&  sudo rm  -fr cloudnative &>/dev/null  &&  sudo git clone https://gitee.com/zettadb/cloudnative.git &>/dev/null
+  if [[ $? -eq 0 ]];then
+    echo -e "$COL_START$GREEN最新程序下载成功$COL_END"
+  else
+    echo -e "$COL_START$RED程序下载失败$COL_END"
+    exit
+  fi
+
+else
+  echo -e "$COL_START$GREEN正在下载最新代码$COL_END"
+  cd /softwares &&  sudo git clone https://gitee.com/zettadb/cloudnative.git  &>/dev/null
+  if [[ $? -eq 0 ]];then
+    echo -e "$COL_START$GREEN最新程序下载成功$COL_END"
+  else 
+    echo -e "$COL_START$RED程序下载失败$COL_END"
+    exit
+  fi
+
+fi
+
+
+
+
+
+
+#!
 
 
 

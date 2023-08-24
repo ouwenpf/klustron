@@ -27,7 +27,7 @@ elif [[ $(echo `pwd`|grep 'cloudnative/cluster$'|wc -l)  -ne 1 ]]; then
 
   
 elif ! jq  '.machines[].user'  $config_json |sed 's/null/"kunlun"/g'|sort -rn|uniq|egrep   -wq  "$USER";then
-  echo -e  "$COL_START$RED$config_json中不存在用户:$USER,请到对应的用户下执行脚本$COL_END"
+  echo -e  "$COL_START$RED$config_json中没有设置用户:$USER,请到对应的用户下执行脚本$COL_END"
   exit  
 
 
