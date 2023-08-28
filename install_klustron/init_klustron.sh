@@ -39,8 +39,8 @@ if ! id $klustron_user &>/dev/null;then
 	echo 'kunlun#'|sudo passwd  --stdin $klustron_user &>/dev/null 
  
 	if [[ $? == 0 ]];then
-   if ! egrep -q "^$klustron_user.*NOPASSWD: ALL$"  /etc/sudoers;then
-     sed -ri '/Allow root to run any commands anywhere/a '${klustron_user}'  ALL=(ALL)  NOPASSWD: ALL'  /etc/sudoers  &>/dev/null 
+   if ! sudo egrep -q "^$klustron_user.*NOPASSWD: ALL$"  /etc/sudoers;then
+     sed -ri '/Allow root to run any commands anywhere/a '${klustron_user:-kunlun}'  ALL=(ALL)  NOPASSWD: ALL'  /etc/sudoers  &>/dev/null 
        if [[ $? == 0 ]];then
          echo  -e "$COL_START${GREEN}$1 User created successfully$COL_END"
        fi
@@ -52,8 +52,8 @@ if ! id $klustron_user &>/dev/null;then
  fi
 
 else
-  if ! egrep -q "^$klustron_user.*NOPASSWD: ALL$"  /etc/sudoers;then
-    sed -ri '/Allow root to run any commands anywhere/a '${klustron_user}'  ALL=(ALL)  NOPASSWD: ALL'  /etc/sudoers  &>/dev/null 
+  if ! sudo egrep -q "^$klustron_user.*NOPASSWD: ALL$"  /etc/sudoers;then
+    sed -ri '/Allow root to run any commands anywhere/a '${klustron_user:-kunlun}'  ALL=(ALL)  NOPASSWD: ALL'  /etc/sudoers  &>/dev/null 
     if [[ $? == 0 ]];then
       echo  -e "$COL_START${GREEN}$1 User created successfully$COL_END"
     fi
@@ -101,7 +101,7 @@ fi
 
 
 if [[ -f  /etc/selinux/config ]];then
-	sudo setenforce 0 &&\
+	sudo setenforce 0 &>/dev/null &&\
 	sudo sed -ri  's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config   &>/dev/null
 	if [[ $? == 0 ]];then
    echo  -e "$COL_START${GREEN}SELINUX configuration successful$COL_END"
@@ -136,7 +136,7 @@ EOF
 	else
    echo  -e "$COL_START${RED}limits configuration  failed$COL_END"
 		
-	fi 
+	fi  
 
 fi
 
@@ -168,14 +168,45 @@ fi
 sudo yum install -y python git wget yum-utils sysvinit-tools libaio libaio-devel expect  python3-3.6.8-18.el7.x86_64 jq figlet &>/dev/null
 if [[ $? == 0 ]];then
   echo  -e "$COL_START${GREEN}Basic package installation successful$COL_END"
-  exit 100
 	
 else
   echo  -e "$COL_START${RED}Basic package installation  failed$COL_END"
 	
-  exit
 fi 
 
+
+
+if [[ -s /tmp/docker.log ]];then
+  if ! sudo docker info 2>/dev/null|grep -iwq running;then
+    if ! command -v docker &>/dev/null;then
+      sudo yum-config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo &>/dev/null &&\
+      sudo yum install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin device-mapper-persistent-data lvm2  &>/dev/null &&\
+      sudo systemctl start docker.service &>/dev/null
+      if [[ $? -eq 0 ]];then
+        echo  -e "$COL_START${GREEN}docker start successful$COL_END"
+      else
+        echo  -e "$COL_START${RED}docker start or install failed$COL_END"
+      
+        exit 88
+      fi
+      
+      
+    else
+      sudo systemctl start docker.service &>/dev/null 
+      if [[ $? -eq 0 ]];then
+        echo  -e "$COL_START${GREEN}docker start successful$COL_END"
+      else
+        echo  -e "$COL_START${RED}docker start failed$COL_END"
+        exit 66
+      fi
+    
+    fi
+      
+  
+  fi
+
+  
+fi
 
 
 }
@@ -195,8 +226,8 @@ if ! id $klustron_user &>/dev/null;then
 	sudo echo -e "kunlun#\nkunlun#"|sudo passwd $klustron_user &>/dev/null  
  
 	if [[ $? == 0 ]];then
-   if ! egrep -q "^$klustron_user.*NOPASSWD: ALL$"  /etc/sudoers;then
-     sudo sed -ri '/Members of the admin group may gain root privileges/i '${klustron_user}'  ALL=(ALL)  NOPASSWD: ALL'  /etc/sudoers  &>/dev/null 
+   if ! sudo egrep -q "^$klustron_user.*NOPASSWD: ALL$"  /etc/sudoers;then
+     sudo sed -ri '/Members of the admin group may gain root privileges/i '${klustron_user:-kunlun}'  ALL=(ALL)  NOPASSWD: ALL'  /etc/sudoers  &>/dev/null 
        if [[ $? == 0 ]];then
          echo  -e "$COL_START${GREEN}$1 User created successfully$COL_END"
        fi
@@ -208,8 +239,8 @@ if ! id $klustron_user &>/dev/null;then
  fi
 
 else
-  if ! egrep -q "^$klustron_user.*NOPASSWD: ALL$"  /etc/sudoers;then
-    sudo sed -ri '/Members of the admin group may gain root privileges/i '${klustron_user}'  ALL=(ALL)  NOPASSWD: ALL'  /etc/sudoers  &>/dev/null 
+  if ! sudo egrep -q "^$klustron_user.*NOPASSWD: ALL$"  /etc/sudoers;then
+    sudo sed -ri '/Members of the admin group may gain root privileges/i '${klustron_user:-kunlun}'  ALL=(ALL)  NOPASSWD: ALL'  /etc/sudoers  &>/dev/null 
     if [[ $? == 0 ]];then
       echo  -e "$COL_START${GREEN}$1 User created successfully$COL_END"
     fi
@@ -335,13 +366,47 @@ sudo apt-get update &>/dev/null &&\
 sudo apt-get install -y git apt-utils libicu-dev  libreadline-dev zlib1g-dev flex bison libssl-dev libcrypt-dev gcc g++ pkg-config python2 python2-dev libncurses5  locales python-setuptools unzip chrony expect jq figlet  curl lsb-release gnupg gnupg-l10n gnupg-utils net-tools iputils-ping sshpass &>/dev/null
 if [[ $? == 0 ]];then
   echo  -e "$COL_START${GREEN}Basic package installation successful$COL_END"
-  exit 100
 	
 else
   echo  -e "$COL_START${RED}Basic package installation  failed$COL_END"
 	
-  exit
 fi 
+
+
+
+
+if [[ -s /tmp/docker.log ]];then
+  if ! sudo docker info 2>/dev/null|grep -iwq running;then
+    if ! command -v docker &>/dev/null;then
+      sudo apt-get  install -y docker.io &>/dev/null &&\
+      sudo systemctl start docker.service &>/dev/null
+      if [[ $? -eq 0 ]];then
+        echo  -e "$COL_START${GREEN}docker start successful$COL_END"
+      else
+        echo  -e "$COL_START${RED}docker start or install failed$COL_END"
+        exit 
+      fi
+      
+      
+    else
+      sudo systemctl start docker.service &>/dev/null 
+      if [[ $? -eq 0 ]];then
+        echo  -e "$COL_START${GREEN}docker start successful$COL_END"
+      else
+        echo  -e "$COL_START${RED}docker start failed$COL_END"
+        exit
+      fi
+    
+    fi
+      
+  
+  fi
+
+  
+fi
+
+
+
 
 
 }
@@ -358,14 +423,15 @@ if [ -f "/etc/os-release" ]; then
     elif [[ "$ID" == "centos" ]]; then
       echo  -e "$COL_START${GREEN}OS is CentOS$COL_END"
       init_centos  
+      echo $?
     else
       echo  -e "$COL_START$RED未知系统$COL_END"
       exit
     fi
   
-  else
-      echo "os-release文件不存,未知系统"
-	    exit
+else
+  echo "os-release文件不存,未知系统"
+  exit
 fi
 
 

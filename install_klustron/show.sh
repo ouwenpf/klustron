@@ -113,8 +113,8 @@ while true; do
   有关Klustron分布式数据详细信信息请查询泽拓科技(深圳)有限责任官方网站:https://www.kunlunbase.com/
   
   安装Klustron分布式数据库主要事项:
-1.安装脚本会自动下载最新代码,请使用root用户或具有root权限的用户运行此脚本
-2.代码下载路径为/softwares/cloudnative
+1.安装脚本会自动下载最新程序,请使用root用户或具有root权限的用户运行此脚本
+2.程序下载路径为/softwares/cloudnative
 3.请切换到目录/softwares/cloudnative/cluster下面,vim cluster_template.json编辑配置文件
   进行少量的配置(配置文件名称可以随意修改),修改对应IP即可(配置文件提供三个主机配置,采用对等配置达到节约资源的目的),
   如果集群超过三个主机可以参考官方详细配置http://doc.klustron.com/zh/install_by_scripts.html
