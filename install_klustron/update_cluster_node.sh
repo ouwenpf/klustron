@@ -6,7 +6,7 @@ RED='31m'
 GREEN='32m'
 YELLOW='33m'
 config_json=$1
-VERSION=1.2.1
+klustron_VERSION=1.2.1
 
 if [[ ! -s $config_json ]]  ||  [[ $# -ne 1 ]]; then
 	echo -e "$COL_START${RED}Usage $0 args file_json $COL_END"
@@ -73,7 +73,7 @@ if [[ $oper_id == 3 ]];then
 
   if [[ -d clustermgr ]];then
 	  cd  clustermgr &>/dev/null &&\
-	  rm -f kunlun-cluster-manager-$VERSION.tgz &>/dev/null &&\
+	  rm -f kunlun-cluster-manager-$klustron_VERSION.tgz &>/dev/null &&\
 	  cd -  &>/dev/null
   else 
 	  echo -e "$COL_START${RED}clustermgr:No such file or directory$COL_END"
@@ -83,7 +83,7 @@ elif [[ $oper_id == 4 ]];then
 
   if [[ -d clustermgr ]];then
 	  cd  clustermgr &>/dev/null &&\
-	  rm -f kunlun-node-manager-$VERSION.tgz &>/dev/null &&\
+	  rm -f kunlun-node-manager-$klustron_VERSION.tgz &>/dev/null &&\
 	  cd -  &>/dev/null
   else 
 	  echo -e "$COL_START${RED}clustermgr:No such file or directory$COL_END"
@@ -98,7 +98,7 @@ fi
 
 
 if nc -z 192.168.0.104  14000 ;then
-	python2 setup_cluster_manager.py --action=download --downloadsite=internal --downloadtype=daily_rel --product_version=$VERSION &>/dev/null
+	python2 setup_cluster_manager.py --action=download --downloadsite=internal --downloadtype=daily_rel --product=$klustron_VERSION &>/dev/null
   if [[ $? -eq 0 ]];then
     echo -e "$COL_START${GREEN}更新包已经下载完毕,正准备更新$COL_END"
   else
@@ -108,7 +108,7 @@ if nc -z 192.168.0.104  14000 ;then
     
 
 else
-	python2 setup_cluster_manager.py --action=download --downloadsite=devsite  --downloadtype=daily_rel --product_version=$VERSION &>/dev/null
+	python2 setup_cluster_manager.py --action=download --downloadsite=devsite  --downloadtype=daily_rel --product=$klustron_VERSION &>/dev/null
    if [[ $? -eq 0 ]];then
     echo -e "$COL_TTART${GREEN}更新包已经下载完毕,正准备更新$COL_END"
   else
@@ -121,21 +121,21 @@ fi
 
 
 
-if [[ -s clustermgr/kunlun-cluster-manager-$VERSION.tgz ]];then
-	cd clustermgr &&  tar xf kunlun-cluster-manager-$VERSION.tgz && cd ../
+if [[ -s clustermgr/kunlun-cluster-manager-$klustron_VERSION.tgz ]];then
+	cd clustermgr &&  tar xf kunlun-cluster-manager-$klustron_VERSION.tgz && cd ../
 else
 	
-   echo -e "$COL_START${RED}请检查kunlun-cluster-manager-$VERSION.tgz文件是否完整和存在$COL_END"
+   echo -e "$COL_START${RED}请检查kunlun-cluster-manager-$klustron_VERSION.tgz文件是否完整和存在$COL_END"
    exit
 	
 fi
 
 
-if [[ -s clustermgr/kunlun-node-manager-$VERSION.tgz ]];then
-	cd clustermgr &&  tar xf kunlun-node-manager-$VERSION.tgz && cd ../
+if [[ -s clustermgr/kunlun-node-manager-$klustron_VERSION.tgz ]];then
+	cd clustermgr &&  tar xf kunlun-node-manager-$klustron_VERSION.tgz && cd ../
 else
 	
-   echo -e "$COL_START${RED}请检查kunlun-node-manager-$VERSION.tgz文件是否完整和存在$COL_END"
+   echo -e "$COL_START${RED}请检查kunlun-node-manager-$klustron_VERSION.tgz文件是否完整和存在$COL_END"
    exit
 	
 fi
@@ -150,15 +150,12 @@ restart_cluster_mgr(){
 
 	echo -e "$COL_START${RED}restart_cluster_mgr...$COL_END"
   #download_software
- #VERSION=$(ls kunlun-node-manager-*gz|awk -F '-'  '{print $4}'|cut -c  1-5)
+ #klustron_VERSION=$(ls kunlun-node-manager-*gz|awk -F '-'  '{print $4}'|cut -c  1-5)
  
 	for i in $(seq 0 $((${#ip_list[*]}-1)))
 	do
- 
-    if ! nc -z  ${ip_list[$i]} ${sshport_list[$i]};then 
-      echo -e "$COL_START${RED}主机${ip_list[$i]}端口${sshport_list[$i]}有异常,无法连接,请检查网络$COL_END" 
-      continue  
-    fi
+  
+    
     
      if [[ "${user_list[$i]}" == "null" ]];then
       user_list[$i]="kunlun"
@@ -178,8 +175,10 @@ restart_cluster_mgr(){
       systemctl_cluster_mgr=$(ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "cd ${basedir_list[$i]};ls kunlun-cluster-manager-*.service")
     fi
     
-
-    
+    if ! nc -z  ${ip_list[$i]} ${sshport_list[$i]};then 
+      echo -e "$COL_START${RED}主机${ip_list[$i]}端口${sshport_list[$i]}有异常,无法连接,请检查网络$COL_END" 
+      continue 
+    fi
     
 
     
@@ -188,15 +187,15 @@ restart_cluster_mgr(){
 
       # stop_cluster_mgr
 
-      if  ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-cluster-manager-'"$VERSION"'" | grep -vq grep' ;then
+      if  ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-cluster-manager-'"$klustron_VERSION"'" | grep -vq grep' ||  ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "sudo systemctl  is-active --quiet $systemctl_cluster_mgr";then
         while true
         do
       
           ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "sudo systemctl stop $systemctl_cluster_mgr &>/dev/null" 
-          ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-cluster-manager-'"$VERSION"'" | grep -v grep | awk '\''{print "kill -9", $2}'\''|bash' 
+          ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-cluster-manager-'"$klustron_VERSION"'" | grep -v grep | awk '\''{print "kill -9", $2}'\''|bash' 
         
         
-          if ! ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-cluster-manager-'"$VERSION"'" | grep -vq grep' ;then
+          if ! ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-cluster-manager-'"$klustron_VERSION"'" | grep -vq grep' && ! ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "sudo systemctl  is-active --quiet $systemctl_cluster_mgr";then
             break 
           fi
         
@@ -207,13 +206,13 @@ restart_cluster_mgr(){
     
       # start_cluster_mgr 
       #if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "test -s ${basedir_list[$i]}/kunlun-cluster-manager-*.service";then
-      if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "test -s ${basedir_list[$i]}/kunlun-cluster-manager-$VERSION/bin/start_cluster_mgr.sh";then
+      if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "test -s ${basedir_list[$i]}/kunlun-cluster-manager-$klustron_VERSION/bin/start_cluster_mgr.sh";then
       while true
       do
-        #ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "cd ${basedir_list[$i]}/kunlun-cluster-manager-$VERSION/bin && ./start_cluster_mgr.sh" &>/dev/null
+        #ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "cd ${basedir_list[$i]}/kunlun-cluster-manager-$klustron_VERSION/bin && ./start_cluster_mgr.sh" &>/dev/null
         ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "sudo systemctl start $systemctl_cluster_mgr &>/dev/null" 
         
-          if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-cluster-manager-'"$VERSION"'" | grep -vq grep' ;then 
+          if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-cluster-manager-'"$klustron_VERSION"'" | grep -vq grep'||ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "sudo systemctl  is-active --quiet $systemctl_cluster_mgr";then
             echo -e "$COL_START${GREEN}${ip_list[$i]}主机cluster_mgr重启成功$COL_END"
             break 
           
@@ -227,7 +226,7 @@ restart_cluster_mgr(){
         
         
       done
-       
+       count_start_cluster_mgr=0
     fi
  
  
@@ -247,15 +246,10 @@ update_cluster_mgr(){
 
 	echo -e "$COL_START${RED}update_cluster_mgr...$COL_END"
   download_software
- #VERSION=$(ls kunlun-node-manager-*gz|awk -F '-'  '{print $4}'|cut -c  1-5)
+ #klustron_VERSION=$(ls kunlun-node-manager-*gz|awk -F '-'  '{print $4}'|cut -c  1-5)
 	for i in $(seq 0 $((${#ip_list[*]}-1)))
 	do
  
-    if ! nc -z  ${ip_list[$i]} ${sshport_list[$i]};then 
-      echo -e "$COL_START${RED}主机${ip_list[$i]}端口${sshport_list[$i]}有异常,无法连接,请检查网络$COL_END" 
-      continue  
-    fi
-    
      if [[ "${user_list[$i]}" == "null" ]];then
       user_list[$i]="kunlun"
     fi 
@@ -271,26 +265,33 @@ update_cluster_mgr(){
     
      
     if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "test -s ${basedir_list[$i]}/kunlun-cluster-manager-*.service";then
-      systemctl_cluster=$(ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "cd ${basedir_list[$i]};ls kunlun-cluster-manager-*.service")
+      systemctl_cluster_mgr=$(ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "cd ${basedir_list[$i]};ls kunlun-cluster-manager-*.service")
     fi
+    
+    if ! nc -z  ${ip_list[$i]} ${sshport_list[$i]};then 
+      echo -e "$COL_START${RED}主机${ip_list[$i]}端口${sshport_list[$i]}有异常,无法连接,请检查网络$COL_END" 
+      continue 
+    fi
+    
     
     
       # stop_cluster_mgr
 
-      if  ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-cluster-manager-'"$VERSION"'" | grep -vq grep' ;then
+      if  ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-cluster-manager-'"$klustron_VERSION"'" | grep -vq grep' || ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "sudo systemctl  is-active --quiet $systemctl_cluster_mgr";then
         while true
         do
       
-          ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "sudo systemctl stop $systemctl_cluster &>/dev/null" 
-          ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-cluster-manager-'"$VERSION"'" | grep -v grep | awk '\''{print "kill -9", $2}'\''|bash' 
+          ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "sudo systemctl stop $systemctl_cluster_mgr &>/dev/null" 
+          ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-cluster-manager-'"$klustron_VERSION"'" | grep -v grep | awk '\''{print "kill -9", $2}'\''|bash' 
         
         
-          if ! ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-cluster-manager-'"$VERSION"'" | grep -vq grep' ;then
+          if ! ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "sudo systemctl  is-active --quiet $systemctl_cluster_mgr" && ! ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-cluster-manager-'"$klustron_VERSION"'" | grep -vq grep' ;then
             break 
           fi
         
         done
       fi
+        
       
       
       
@@ -301,17 +302,17 @@ update_cluster_mgr(){
     
     
     # start_cluster_mgr   
-    if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "test -s ${basedir_list[$i]}/kunlun-cluster-manager-$VERSION/bin/start_cluster_mgr.sh";then
-    scp -rp -P${sshport_list[$i]} clustermgr/kunlun-cluster-manager-$VERSION.tgz ${user_list[$i]}@${ip_list[$i]}:${basedir_list[$i]} &>/dev/null &&\
-    scp -rp -P${sshport_list[$i]} clustermgr/kunlun-cluster-manager-$VERSION/bin ${user_list[$i]}@${ip_list[$i]}:${basedir_list[$i]}/kunlun-cluster-manager-$VERSION/  &>/dev/null  &&\
-    scp -rp -P${sshport_list[$i]} clustermgr/kunlun-cluster-manager-$VERSION/build.info ${user_list[$i]}@${ip_list[$i]}:${basedir_list[$i]}/kunlun-cluster-manager-$VERSION/  &>/dev/null 
+    if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "test -s ${basedir_list[$i]}/kunlun-cluster-manager-$klustron_VERSION/bin/start_cluster_mgr.sh";then
+    scp -rp -P${sshport_list[$i]} clustermgr/kunlun-cluster-manager-$klustron_VERSION.tgz ${user_list[$i]}@${ip_list[$i]}:${basedir_list[$i]} &>/dev/null &&\
+    scp -rp -P${sshport_list[$i]} clustermgr/kunlun-cluster-manager-$klustron_VERSION/bin ${user_list[$i]}@${ip_list[$i]}:${basedir_list[$i]}/kunlun-cluster-manager-$klustron_VERSION/  &>/dev/null  &&\
+    scp -rp -P${sshport_list[$i]} clustermgr/kunlun-cluster-manager-$klustron_VERSION/build.info ${user_list[$i]}@${ip_list[$i]}:${basedir_list[$i]}/kunlun-cluster-manager-$klustron_VERSION/  &>/dev/null 
     
       while true
       do
-        #ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "cd ${basedir_list[$i]}/kunlun-cluster-manager-$VERSION/bin && ./start_cluster_mgr.sh" &>/dev/null
-        ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "sudo systemctl start $systemctl_cluster &>/dev/null" 
+        #ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "cd ${basedir_list[$i]}/kunlun-cluster-manager-$klustron_VERSION/bin && ./start_cluster_mgr.sh" &>/dev/null
+        ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "sudo systemctl start $systemctl_cluster_mgr &>/dev/null" 
         
-          if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-cluster-manager-'"$VERSION"'" | grep -vq grep' ;then 
+          if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-cluster-manager-'"$klustron_VERSION"'" | grep -vq grep'|| ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "sudo systemctl  is-active --quiet $systemctl_cluster_mgr";then
             echo -e "$COL_START${GREEN}${ip_list[$i]}主机cluster_mgr更新成功$COL_END"
             break 
           
@@ -325,7 +326,7 @@ update_cluster_mgr(){
         
         
       done
-           
+      count_start_cluster_mgr=0
    fi  
         
           
@@ -348,16 +349,11 @@ restart_node_mgr(){
 
 	echo -e "$COL_START${RED}restart_node_mgr...$COL_END"
   #download_software
- #VERSION=$(ls kunlun-node-manager-*gz|awk -F '-'  '{print $4}'|cut -c  1-5)
+ #klustron_VERSION=$(ls kunlun-node-manager-*gz|awk -F '-'  '{print $4}'|cut -c  1-5)
  
 	for i in $(seq 0 $((${#ip_list[*]}-1)))
 	do
  
-    if ! nc -z  ${ip_list[$i]} ${sshport_list[$i]};then 
-      echo -e "$COL_START${RED}主机${ip_list[$i]}端口${sshport_list[$i]}有异常,无法连接,请检查网络$COL_END" 
-      continue  
-    fi
-    
      if [[ "${user_list[$i]}" == "null" ]];then
       user_list[$i]="kunlun"
     fi 
@@ -376,6 +372,12 @@ restart_node_mgr(){
       systemctl_node_mgr=$(ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "cd ${basedir_list[$i]};ls kunlun-node-manager-*.service")
     fi
     
+    if ! nc -z  ${ip_list[$i]} ${sshport_list[$i]};then 
+      echo -e "$COL_START${RED}主机${ip_list[$i]}端口${sshport_list[$i]}有异常,无法连接,请检查网络$COL_END" 
+      continue 
+    fi
+    
+    
 
     
     
@@ -386,15 +388,15 @@ restart_node_mgr(){
 
       # stop_node_mgr
 
-      if  ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-node-manager-'"$VERSION"'" | grep -vq grep' ;then
+      if  ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-node-manager-'"$klustron_VERSION"'" | grep -vq grep' || ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "sudo systemctl  is-active --quiet $systemctl_node_mgr";then
         while true
         do
       
           ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "sudo systemctl stop $systemctl_node_mgr &>/dev/null" 
-          ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-node-manager-'"$VERSION"'" | grep -v grep | awk '\''{print "kill -9", $2}'\''|bash' 
+          ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-node-manager-'"$klustron_VERSION"'" | grep -v grep | awk '\''{print "kill -9", $2}'\''|bash' 
         
         
-          if ! ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-node-manager-'"$VERSION"'" | grep -vq grep' ;then
+          if ! ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-node-manager-'"$klustron_VERSION"'" | grep -vq grep' && ! ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "sudo systemctl  is-active --quiet $systemctl_node_mgr";then
             break 
           fi
         
@@ -405,13 +407,13 @@ restart_node_mgr(){
     
       # start_node_mgr 
       #if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "test -s ${basedir_list[$i]}/kunlun-node-manager-*.service";then
-      if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "test -s ${basedir_list[$i]}/kunlun-node-manager-$VERSION/bin/start_node_mgr.sh";then
+      if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "test -s ${basedir_list[$i]}/kunlun-node-manager-$klustron_VERSION/bin/start_node_mgr.sh" ;then
       while true
       do
         #ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "cd ${basedir_list[$i]}/kunlun-node-manager-$VERSION/bin && ./start_node_mgr.sh" &>/dev/null
         ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "sudo systemctl start $systemctl_node_mgr &>/dev/null" 
         
-          if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-node-manager-'"$VERSION"'" | grep -vq grep' ;then 
+          if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-node-manager-'"$klustron_VERSION"'" | grep -vq grep' || ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "sudo systemctl  is-active --quiet $systemctl_node_mgr";then 
             echo -e "$COL_START${GREEN}${ip_list[$i]}主机node_mgr重启成功$COL_END"
             break 
           
@@ -425,14 +427,13 @@ restart_node_mgr(){
         
         
       done
-       
+      count_start_node_mgr=0
     fi
  
  
  
     
 	done
-
 
 
 }
@@ -445,15 +446,10 @@ update_node_mgr(){
 
 	echo -e "$COL_START${RED}update_node_mgr...$COL_END"
   download_software
- #VERSION=$(ls kunlun-node-manager-*gz|awk -F '-'  '{print $4}'|cut -c  1-5)
+ #klustron_VERSION=$(ls kunlun-node-manager-*gz|awk -F '-'  '{print $4}'|cut -c  1-5)
 	for i in $(seq 0 $((${#ip_list[*]}-1)))
 	do
  
-    if ! nc -z  ${ip_list[$i]} ${sshport_list[$i]};then 
-      echo -e "$COL_START${RED}主机${ip_list[$i]}端口${sshport_list[$i]}有异常,无法连接,请检查网络$COL_END" 
-      continue  
-    fi
-    
      if [[ "${user_list[$i]}" == "null" ]];then
       user_list[$i]="kunlun"
     fi 
@@ -468,22 +464,29 @@ update_node_mgr(){
     fi
     
      
+     
     if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "test -s ${basedir_list[$i]}/kunlun-node-manager-*.service";then
       systemctl_node_mgr=$(ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "cd ${basedir_list[$i]};ls kunlun-node-manager-*.service")
     fi
     
     
+    if ! nc -z  ${ip_list[$i]} ${sshport_list[$i]};then 
+      echo -e "$COL_START${RED}主机${ip_list[$i]}端口${sshport_list[$i]}有异常,无法连接,请检查网络$COL_END" 
+      continue 
+    fi
+    
+    
       # stop_node_mgr
 
-      if  ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-node-manager-'"$VERSION"'" | grep -vq grep' ;then
+      if  ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-node-manager-'"$klustron_VERSION"'" | grep -vq grep' || ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "sudo systemctl  is-active --quiet $systemctl_node_mgr";then
         while true
         do
       
           ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "sudo systemctl stop $systemctl_node_mgr &>/dev/null" 
-          ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-node-manager-'"$VERSION"'" | grep -v grep | awk '\''{print "kill -9", $2}'\''|bash' 
+          ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-node-manager-'"$klustron_VERSION"'" | grep -v grep | awk '\''{print "kill -9", $2}'\''|bash' 
         
         
-          if ! ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-node-manager-'"$VERSION"'" | grep -vq grep' ;then
+          if ! ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-node-manager-'"$klustron_VERSION"'" | grep -vq grep' && ! ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "sudo systemctl  is-active --quiet $systemctl_node_mgr";then
             break 
           fi
         
@@ -499,17 +502,17 @@ update_node_mgr(){
     
     
     # start_node_mgr   
-    if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "test -s ${basedir_list[$i]}/kunlun-node-manager-$VERSION/bin/start_node_mgr.sh";then
-    scp -rp -P${sshport_list[$i]} clustermgr/kunlun-node-manager-$VERSION.tgz ${user_list[$i]}@${ip_list[$i]}:${basedir_list[$i]} &>/dev/null &&\
-    scp -rp -P${sshport_list[$i]} clustermgr/kunlun-node-manager-$VERSION/bin ${user_list[$i]}@${ip_list[$i]}:${basedir_list[$i]}/kunlun-node-manager-$VERSION/  &>/dev/null &&\
-    scp -rp -P${sshport_list[$i]} clustermgr/kunlun-node-manager-$VERSION/build.info ${user_list[$i]}@${ip_list[$i]}:${basedir_list[$i]}/kunlun-node-manager-$VERSION/  &>/dev/null
+    if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "test -s ${basedir_list[$i]}/kunlun-node-manager-$klustron_VERSION/bin/start_node_mgr.sh";then
+    scp -rp -P${sshport_list[$i]} clustermgr/kunlun-node-manager-$klustron_VERSION.tgz ${user_list[$i]}@${ip_list[$i]}:${basedir_list[$i]} &>/dev/null &&\
+    scp -rp -P${sshport_list[$i]} clustermgr/kunlun-node-manager-$klustron_VERSION/bin ${user_list[$i]}@${ip_list[$i]}:${basedir_list[$i]}/kunlun-node-manager-$klustron_VERSION/  &>/dev/null &&\
+    scp -rp -P${sshport_list[$i]} clustermgr/kunlun-node-manager-$klustron_VERSION/build.info ${user_list[$i]}@${ip_list[$i]}:${basedir_list[$i]}/kunlun-node-manager-$klustron_VERSION/  &>/dev/null
     
       while true
       do
-        #ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "cd ${basedir_list[$i]}/kunlun-node-manager-$VERSION/bin && ./start_node_mgr.sh" &>/dev/null
+        #ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "cd ${basedir_list[$i]}/kunlun-node-manager-$klustron_VERSION/bin && ./start_node_mgr.sh" &>/dev/null
         ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "sudo systemctl start $systemctl_node_mgr &>/dev/null" 
         
-          if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-node-manager-'"$VERSION"'" | grep -vq grep' ;then 
+          if ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} 'ps aux | grep -w "'"${basedir_list[$i]}"'/kunlun-node-manager-'"$klustron_VERSION"'" | grep -vq grep' || ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "sudo systemctl  is-active --quiet $systemctl_node_mgr";then 
             echo -e "$COL_START${GREEN}${ip_list[$i]}主机node_mgr更新成功$COL_END"
             break 
           
@@ -523,7 +526,7 @@ update_node_mgr(){
         
         
       done
-           
+      count_start_node_mgr=0
    fi  
         
           
@@ -541,7 +544,7 @@ update_xpanel(){
 
 	echo -e "$COL_START${RED}update_xpanel...$COL_END"
   install_script
- #VERSION=$(ls kunlun-node-manager-*gz|awk -F '-'  '{print $4}'|cut -c  1-5)
+ #klustron_VERSION=$(ls kunlun-node-manager-*gz|awk -F '-'  '{print $4}'|cut -c  1-5)
 	for i in $(seq 0 $((${#xpanel_ip[*]}-1)))
 	do
     if [[ "${user_list[$i]}" == "null" ]];then
@@ -573,10 +576,8 @@ update_xpanel(){
    if ssh -p${sshport_list[$i]} ${user_list[$i]}@${xpanel_ip[$i]} "sudo docker info >/dev/null";then
        network_mode_list=($(ssh -p${sshport_list[$i]} ${user_list[$i]}@${xpanel_ip[$i]} "sudo docker network ls | egrep -v 'none|host' | awk '{print \$2}' | sed '1d' | sed 's#[[:space:]]##g' | awk '{print NR\".\"\$0}'"))
        install_xpanel=$(egrep -w "xpanel_${xpanel_port[$i]}" clustermgr/install.sh |awk -F ';' 'NR==1{print $2}'|awk -F '"' '{print $1}')
-       install_xpanel_mdc=$(egrep -w "xpanel_${xpanel_port[$i]}" clustermgr/install.sh |awk -F ";" '{print $2}'|awk -F '"' '{print $1}'|sort -rn|uniq |sed 's#--restart=always#--network '$docker_network'  --restart=always#g')
-    
        if [[ ${#network_mode_list[*]} -eq 1 ]];then
-         ssh -p${sshport_list[$i]} ${user_list[$i]}@${xpanel_ip[$i]} "sudo docker container rm -f xpanel_${xpanel_port[$i]} &>/dev/null && sudo docker image rm -f registry.cn-hangzhou.aliyuncs.com/kunlundb/kunlun-xpanel:$VERSION &>/dev/null" &&\
+         ssh -p${sshport_list[$i]} ${user_list[$i]}@${xpanel_ip[$i]} "sudo docker container rm -f xpanel_${xpanel_port[$i]} &>/dev/null && sudo docker image rm -f registry.cn-hangzhou.aliyuncs.com/kunlundb/kunlun-xpanel:$klustron_VERSION &>/dev/null" &&\
          ssh -p${sshport_list[$i]} ${user_list[$i]}@${xpanel_ip[$i]} "$install_xpanel &>/dev/null"
          
           if [[ $? -eq 0 ]];then
@@ -612,19 +613,19 @@ for i in install clean start stop
 do
 
 if [[ "$mdc" == "null"  ]];then
-  python2 setup_cluster_manager.py --autostart --config=$config_json   --product_version=$VERSION --action=$i  &>/dev/null
+  python2 setup_cluster_manager.py --autostart --config=$config_json   --product=$klustron_VERSION --action=$i  &>/dev/null
   xpanel_ip=($(jq  '.xpanel.ip'  $config_json |xargs))
   xpanel_port=($(jq  '.xpanel.port'  $config_json |xargs))
 
   if [[ $? -ne 0 ]];then
-    echo -e "$COL_START${RED}命令python2 setup_cluster_manager.py --autostart --config=$config_json   --product_version=$VERSION --action=$i执行有误,请单独执行,根据提示错误进行排除问题$COL_END" 
+    echo -e "$COL_START${RED}命令python2 setup_cluster_manager.py --autostart --config=$config_json   --product=$klustron_VERSION --action=$i执行有误,请单独执行,根据提示错误进行排除问题$COL_END" 
     exit
   fi
 
 else
-  python2 setup_cluster_manager.py --autostart --config=$config_json  --multipledc --product_version=$VERSION  --action=$i &>/dev/null
+  python2 setup_cluster_manager.py --autostart --config=$config_json  --multipledc --product=$klustron_VERSION  --action=$i &>/dev/null
   if [[ $? -ne 0 ]];then
-    echo -e "$COL_START${RED}命令python2 setup_cluster_manager.py --autostart --config=$config_json   --product_version=$VERSION --action=$i执行有误,请单独执行,根据提示错误进行排除问题$COL_END"  
+    echo -e "$COL_START${RED}命令python2 setup_cluster_manager.py --autostart --config=$config_json   --product=$klustron_VERSION --action=$i执行有误,请单独执行,根据提示错误进行排除问题$COL_END"  
     exit
   else
     xpanel_ip=($(jq  '.xpanel.nodes[].ip'  $config_json |xargs))
@@ -654,10 +655,11 @@ read  -t 300 -p "请输入操作序号: "   network_id
 
 if [[ $network_id =~ ^[0-9]+$ ]] && [[ $network_id -le "${#network_mode_list[*]}" ]]; then
     docker_network=$(echo "${network_mode_list[$(($network_id-1))]}"|sed 's#^[0-9].##g')
-    
+    install_xpanel=$(egrep -w "xpanel_${xpanel_port[$i]}" clustermgr/install.sh |awk -F ';' 'NR==1{print $2}'|awk -F '"' '{print $1}')
+    install_xpanel_mdc=$(egrep -w "xpanel_${xpanel_port[$i]}" clustermgr/install.sh |awk -F ";" '{print $2}'|awk -F '"' '{print $1}'|sort -rn|uniq |sed 's#--restart=always#--network '$docker_network'  --restart=always#g')
     
     if [[ "$docker_network" == "bridge" ]];then
-      ssh -p${sshport_list[$i]} ${user_list[$i]}@${xpanel_ip[$i]} "sudo docker container rm -f xpanel_${xpanel_port[$i]} &>/dev/null && sudo docker image rm -f registry.cn-hangzhou.aliyuncs.com/kunlundb/kunlun-xpanel:$VERSION &>/dev/null" &&\
+      ssh -p${sshport_list[$i]} ${user_list[$i]}@${xpanel_ip[$i]} "sudo docker container rm -f xpanel_${xpanel_port[$i]} &>/dev/null && sudo docker image rm -f registry.cn-hangzhou.aliyuncs.com/kunlundb/kunlun-xpanel:$klustron_VERSION &>/dev/null" &&\
       ssh -p${sshport_list[$i]} ${user_list[$i]}@${xpanel_ip[$i]} "$install_xpanel &>/dev/null"
       if [[ $? -eq 0 ]];then
         echo -e "$COL_START${GREEN}${xpanel_ip[$i]}主机:xpanel更新成功$COL_END"
@@ -666,7 +668,8 @@ if [[ $network_id =~ ^[0-9]+$ ]] && [[ $network_id -le "${#network_mode_list[*]}
       fi
       
     else
-      ssh -p${sshport_list[$i]} ${user_list[$i]}@${xpanel_ip[$i]} "sudo docker container rm -f xpanel_${xpanel_port[$i]} &>/dev/null && sudo docker image rm -f registry.cn-hangzhou.aliyuncs.com/kunlundb/kunlun-xpanel:$VERSION &>/dev/null" &&\
+      
+      ssh -p${sshport_list[$i]} ${user_list[$i]}@${xpanel_ip[$i]} "sudo docker container rm -f xpanel_${xpanel_port[$i]} &>/dev/null && sudo docker image rm -f registry.cn-hangzhou.aliyuncs.com/kunlundb/kunlun-xpanel:$klustron_VERSION &>/dev/null" &&\
       ssh -p${sshport_list[$i]} ${user_list[$i]}@${xpanel_ip[$i]} "$install_xpanel_mdc &>/dev/null"
       if [[ $? -eq 0 ]];then
         echo -e "$COL_START${GREEN}${xpanel_ip[$i]}主机:xpanel更新成功$COL_END"
@@ -739,4 +742,5 @@ case $oper_id in
 
 
 esac
+
 
