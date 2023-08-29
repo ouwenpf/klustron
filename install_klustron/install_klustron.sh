@@ -512,6 +512,82 @@ fi
 
 
 
+check_klustron_exist(){
+
+
+for i in $(seq 0 $((${#ip_list[*]}-1)))
+	do
+  
+    
+    
+    if [[ "${user_list[$i]}" == "null" ]];then
+      user_list[$i]="kunlun"
+    fi 
+   
+    if [[ "${basedir_list[$i]}" == "null" ]];then
+      basedir_list[$i]="/kunlun"
+      
+    fi
+ 
+    if [[ "${sshport_list[$i]}" == "null" ]];then
+      sshport_list[$i]=22
+    fi
+    
+
+
+  
+    
+
+expect <<EOF  >/tmp/node_mgr 2>/dev/null
+	#spawn  ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "test -s ${basedir_list[$i]}/kunlun-node-manager-$klustron_VERSION/bin/start_node_mgr.sh"
+
+
+  spawn  ssh -p${sshport_list[$i]} ${user_list[$i]}@${ip_list[$i]} "ps aux | grep -w '${basedir_list[$i]}/kunlun-node-manager-${klustron_VERSION}' | grep -v grep|wc -l" 
+   
+  	expect {
+		"yes/no" { send "yes\n"; exp_continue }
+		"password" { send "${user_passwd[1]}\n" }
+		
+	
+	}
+ 
+
+	expect eof
+
+EOF
+
+
+node_mgr=$(sed -n '2p' /tmp/node_mgr|dos2unix) 
+
+
+
+echo $node_mgr
+
+if [[ $node_mgr -eq 2  ]];then
+  let count_klustron_exist++
+  echo -e "$COL_START${RED}主机${ip_list[$i]}上已经安装有klustron数据库无法安装..........$COL_END"  
+  
+fi
+
+    
+done
+
+
+
+if [[ $count_klustron_exist -ge 1 ]];then 
+  exit
+fi
+
+
+
+
+
+
+
+
+
+
+}
 
 
 

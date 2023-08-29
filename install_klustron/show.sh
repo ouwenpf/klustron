@@ -40,11 +40,11 @@ if ! command -v figlet &>/dev/null  ;then
     
       if [[ "$ID" == "ubuntu" ]]; then
         echo  -e "$COL_START${GREEN}OS is Ubuntu$COL_END"
-        sudo apt-get install -y figlet expect  &>/dev/null  
+        sudo apt-get install -y figlet expect dos2unix &>/dev/null  
         
       elif [[ "$ID" == "centos" ]]; then
         echo  -e "$COL_START${GREEN}OS is CentOS$COL_END"
-        sudo yum install -y figlet expect &>/dev/null  
+        sudo yum install -y figlet expect dos2unix&>/dev/null  
         
       else
         echo  -e "$COL_START$RED未知系统$COL_END"
