@@ -7,7 +7,7 @@ GREEN='32m'
 YELLOW='33m'
 config_json=$1
 user_passwd=($2 $3)
-VERSION=1.2.1
+klustron_VERSION=1.2.1
 init_file='init_klustron.sh'
 
 
@@ -132,7 +132,7 @@ expect <<EOF
 	spawn  ssh-copy-id -f  -p${sshport_list[$i]}    ${user_list[$i]}@${ip_list[$i]}
 	expect {
 		"yes/no" { send "yes\n"; exp_continue }
-		"password" { send "kunlun#\n" }
+		"password" { send "3G7NtoxW3NQql2ec\n" }
 		
 	
 	}
@@ -149,7 +149,7 @@ expect <<EOF
   spawn  scp  -rp -P${sshport_list[$i]}   $HOME/.ssh/id_rsa  $HOME/.ssh/id_rsa.pub  ${user_list[$i]}@${ip_list[$i]}:$HOME/.ssh
 	expect {
 		"yes/no" { send "yes\n"; exp_continue }
-		"password" { send "kunlun#\n" }
+		"password" { send "3G7NtoxW3NQql2ec\n" }
 		
 	
 	}
@@ -202,7 +202,7 @@ expect <<EOF
 	spawn  ssh-copy-id -f  -p${xpanel_sshport[$i]}    ${user_list[$i]}@${xpanel_ip[$i]}
 	expect {
 		"yes/no" { send "yes\n"; exp_continue }
-		"password" { send "kunlun#\n" }
+		"password" { send "3G7NtoxW3NQql2ec\n" }
 		
 	
 	}
@@ -218,7 +218,7 @@ expect <<EOF
   spawn  scp  -rp -P${xpanel_sshport[$i]}   $HOME/.ssh/id_rsa  $HOME/.ssh/id_rsa.pub  ${user_list[$i]}@${xpanel_ip[$i]}:~/.ssh
 	expect {
 		"yes/no" { send "yes\n"; exp_continue }
-		"password" { send "kunlun#\n" }
+		"password" { send "3G7NtoxW3NQql2ec\n" }
 		
 	
 	}

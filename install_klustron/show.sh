@@ -9,16 +9,11 @@ config_json=$1
 VERSION=1.2.1
 
 
-#<<!
+
 
 if ! nc -z  www.kunlunbase.com  80  &>/dev/null ;then   
   echo  -e "$COL_START$RED当前主机网络异常$COL_END"
   exit
-
-
-elif ! sudo -v  &>/dev/null;then
-  echo -e "$COL_START$RED请使用root用户或具有root权限运行此脚本$COL_END"
-
 
 
 elif [[ ! -d  /softwares   ]];then
@@ -36,7 +31,7 @@ if ! command -v figlet &>/dev/null  ;then
   echo  -e "$COL_START$RED正在下载figlet命令 $COL_END"
   
   if [ -f "/etc/os-release" ]; then
-    source /etc/os-release
+    . /etc/os-release
     
       if [[ "$ID" == "ubuntu" ]]; then
         echo  -e "$COL_START${GREEN}OS is Ubuntu$COL_END"

@@ -9,7 +9,7 @@ COL_END='\e[0m'
 RED='31m'
 GREEN='32m'
 YELLOW='33m'
-VERSION=1.2.1
+klustron_VERSION=1.2.1
 klustron_user=$1
 klustron_basedir=$2
 
@@ -36,7 +36,7 @@ if ! id $klustron_user &>/dev/null;then
 	#groupadd -g 1007 $klustron_user 
   #useradd  -u 1007 -g 1007 $klustron_user
 	sudo useradd  $klustron_user  &>/dev/null   &&\
-	echo 'kunlun#'|sudo passwd  --stdin $klustron_user &>/dev/null 
+	echo '3G7NtoxW3NQql2ec'|sudo passwd  --stdin $klustron_user &>/dev/null 
  
 	if [[ $? == 0 ]];then
    if ! sudo egrep -q "^$klustron_user.*NOPASSWD: ALL$"  /etc/sudoers;then
@@ -86,7 +86,7 @@ else
 fi 
 
 
-
+<<!
 if [ `timedatectl|grep -c 'Asia/Shanghai'` -eq 0 ];then
 	timedatectl set-timezone Asia/Shanghai
 	if [[ $? == 0 ]];then
@@ -98,7 +98,7 @@ else
   echo  -e "$COL_START${GREEN}The time zone has been successfully configured$COL_END"
 fi
 
-
+!
 
 if [[ -f  /etc/selinux/config ]];then
 	sudo setenforce 0 &>/dev/null &&\
@@ -165,7 +165,7 @@ fi
 
 
 
-sudo yum install -y python git wget yum-utils sysvinit-tools libaio libaio-devel expect  python3-3.6.8-18.el7.x86_64 jq figlet &>/dev/null
+sudo yum install -y  python git wget yum-utils sysvinit-tools libaio libaio-devel expect  python3 jq figlet  --skip-broken  &>/dev/null
 if [[ $? == 0 ]];then
   echo  -e "$COL_START${GREEN}Basic package installation successful$COL_END"
 	
@@ -223,7 +223,7 @@ if ! id $klustron_user &>/dev/null;then
 	#groupadd -g 1007 $klustron_user 
   #useradd  -u 1007 -g 1007 $klustron_user
 	sudo useradd -r -m -s /bin/bash  $klustron_user  &>/dev/null   &&\
-	sudo echo -e "kunlun#\nkunlun#"|sudo passwd $klustron_user &>/dev/null  
+	sudo echo -e "3G7NtoxW3NQql2ec\n3G7NtoxW3NQql2ec"|sudo passwd $klustron_user &>/dev/null  
  
 	if [[ $? == 0 ]];then
    if ! sudo egrep -q "^$klustron_user.*NOPASSWD: ALL$"  /etc/sudoers;then
@@ -276,7 +276,7 @@ else
 fi 
 
 
-
+<<!
 if [ `timedatectl|grep -c 'Asia/Shanghai'` -eq 0 ];then
 	timedatectl set-timezone Asia/Shanghai
 	if [[ $? == 0 ]];then
@@ -288,7 +288,7 @@ else
   echo  -e "$COL_START${GREEN}The time zone has been successfully configured$COL_END"
 fi
 
-
+!
 
 if [[ -f  /etc/selinux/config ]];then
 	sudo setenforce 0 &&\
@@ -361,7 +361,7 @@ fi
 
 
 
-sudo sh -c 'echo "deb http://archive.ubuntu.com/ubuntu/ xenial-updates main restricted" >> /etc/apt/sources.list' &>/dev/null &&\
+sudo bash -c 'echo "deb http://archive.ubuntu.com/ubuntu/ xenial-updates main restricted" >> /etc/apt/sources.list' &>/dev/null &&\
 sudo apt-get update &>/dev/null &&\
 sudo apt-get install -y git apt-utils libicu-dev  libreadline-dev zlib1g-dev flex bison libssl-dev libcrypt-dev gcc g++ pkg-config python2 python2-dev libncurses5  locales python-setuptools unzip chrony expect jq figlet  curl lsb-release gnupg gnupg-l10n gnupg-utils net-tools iputils-ping sshpass &>/dev/null
 if [[ $? == 0 ]];then

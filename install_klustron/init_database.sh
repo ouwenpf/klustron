@@ -97,14 +97,14 @@ fi
 
 
 if nc -z 192.168.0.104  14000 ;then
-	python2 setup_cluster_manager.py --action=download --downloadsite=internal --downloadtype=daily_rel --product_version=$klustron_VERSION &>/dev/null
+	python2 setup_cluster_manager.py --action=download --downloadsite=internal --downloadtype=release --product_version=$klustron_VERSION &>/dev/null
    if [[ $? -ne 0 ]];then
     echo -e "$COL_START${RED}Klustron数据库安装包已经下载失败毕$COL_END" 
     exit
    fi
 
 else
-	python2 setup_cluster_manager.py --action=download --downloadsite=devsite  --downloadtype=daily_rel --product_version=$klustron_VERSION &>/dev/null
+	python2 setup_cluster_manager.py --action=download --downloadsite=devsite  --downloadtype=release --product_version=$klustron_VERSION &>/dev/null
    if [[ $? -ne 0 ]];then
     echo -e "$COL_START${RED}Klustron数据库安装包已经下载失败毕$COL_END" 
     exit
@@ -175,7 +175,7 @@ if [[ -s clustermgr/clean.sh && -s clustermgr/install.sh ]];then
   sh clustermgr/clean.sh  && sh clustermgr/install.sh
 
 else
-  echo -e "$COL_START${RED}请检查安装/卸载文件是否存在$COL_END"  
+  echo -e "$COL_START${RED}安装失败,请根据报错信息检查$COL_END"  
 fi
 
 

@@ -16,6 +16,9 @@
 				mysql -P6001 -uclustmgr -pclustmgr_pwd  -h172.16.0.8
                 mysql -P36001 -upgx  -ppgx_pwd   -h192.168.0.129
 				复制：repl：repl_pwd
+root账户登录只能本地:(指定配置文件和socke文件登录)
+				 mysql --defaults-file=/home/kunlun/klustron/storage_datadir/56001/data/56001.cnf -uroot -proot
+				mysql -S /home/kunlun/klustron/storage_logdir/57001/mysql.pid --socket=/home/kunlun/klustron/storage_logdir/57001/mysql.sock -uroot -proot
  kunlun_metadata_db:源数库集群查询
  
 select * from kunlun_metadata_db.cluster_mgr_nodes ; 查询集群管理器节点信息(主节点宕机主备切换)

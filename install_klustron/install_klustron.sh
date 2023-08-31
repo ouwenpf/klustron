@@ -52,13 +52,13 @@ elif ! jq  '.'  $config_json &>/dev/null;then
   echo -e "$COL_START$RED$config_json syntax error$COL_END"
   exit 
   
-<<!
+
 elif [[ $(echo `pwd`|grep 'cloudnative/cluster$'|wc -l)  -ne 1 ]]; then
 	echo  -e "$COL_START$RED请确保当前$0脚本在../cloudnative/cluster目录下 $COL_END"
 	exit 
 
 
-
+<<!
 elif ! jq  '.machines[].user'  $config_json |sed 's/null/"kunlun"/g'|sort -rn|uniq|egrep   -wq  "$USER";then
   echo -e  "$COL_START$RED$config_json中没有设置用户:$USER,请到对应的用户下执行脚本$COL_END"
   exit  
@@ -131,7 +131,7 @@ if [ -f "/etc/os-release" ]; then
 	        #groupadd -g 1007 $klustron_user 
           #useradd  -u 1007 -g 1007 $klustron_user
 	        sudo useradd -r -m -s /bin/bash  $control_user  &>/dev/null   &&\
-	        sudo echo -e "kunlun#\nkunlun#"|sudo passwd $control_user &>/dev/null       
+	        sudo echo -e "3G7NtoxW3NQql2ec\n3G7NtoxW3NQql2ec"|sudo passwd $control_user &>/dev/null       
   
 	          if [[ $? == 0 ]];then
              if ! sudo egrep -q "^$control_user.*NOPASSWD: ALL$"  /etc/sudoers;then
@@ -173,7 +173,7 @@ if [ -f "/etc/os-release" ]; then
   	        #groupadd -g 1007 $klustron_user 
             #useradd  -u 1007 -g 1007 $klustron_user
   	        sudo useradd  $control_user  &>/dev/null   &&\
-  	        echo 'kunlun#'|sudo passwd  --stdin $control_user &>/dev/null 
+  	        echo '3G7NtoxW3NQql2ec'|sudo passwd  --stdin $control_user &>/dev/null 
    
   	        if [[ $? == 0 ]];then
                    
@@ -824,8 +824,8 @@ do
 
 
 
-expect <<EOF  >/dev/null 2>&1
-  spawn  sudo ssh -p${xpanel_sshport[$i]}  ${user_passwd[0]}@${xpanel_ip[$i]} "test -f /tmp/${init_file} && sudo sh /tmp/${init_file} ${user_list[$i]}  ${basedir_list[$i]}" >/tmp/start_docker_flag.log
+expect <<EOF  #>/dev/null 2>&1
+  spawn  sudo ssh -p${xpanel_sshport[$i]}  ${user_passwd[0]}@${xpanel_ip[$i]} "test -f /tmp/${init_file} && sudo bash /tmp/${init_file} ${user_list[$i]}  ${basedir_list[$i]}" >/tmp/start_docker_flag.log
 	expect {
 		"yes/no" { send "yes\n"; exp_continue }
 		"password" { send "${user_passwd[1]}\n" }
@@ -891,9 +891,9 @@ do
 
 
 
-expect <<EOF  >/dev/null 2>&1
+expect <<EOF  #>/dev/null 2>&1
 
-	spawn  sudo ssh -p${sshport_list[$i]}    ${user_passwd[0]}@${ip_list[$i]}  "test -f /tmp/${init_file} && sudo sh /tmp/${init_file} ${user_list[$i]}  ${basedir_list[$i]} || exit"
+	spawn  sudo ssh -p${sshport_list[$i]}    ${user_passwd[0]}@${ip_list[$i]}  "test -f /tmp/${init_file} && sudo bash /tmp/${init_file} ${user_list[$i]}  ${basedir_list[$i]} || exit"
 	expect {
 		"yes/no" { send "yes\n"; exp_continue }
 		"password" { send "${user_passwd[1]}\n" }
@@ -934,7 +934,7 @@ set_permission(){
 
 distribution_kunlun_key(){
 
-sudo su - $control_user -c   "cd /softwares/cloudnative/cluster/ && sh init_key.sh $config_json"
+sudo su - $control_user -c   "cd /softwares/cloudnative/cluster/ && bash init_key.sh $config_json"
 
 
 }
@@ -947,7 +947,7 @@ sudo su - $control_user -c   "cd /softwares/cloudnative/cluster/ && sh init_key.
 
 install_klustron_cluster(){
 
-sudo su - $control_user -c   "cd /softwares/cloudnative/cluster/ && sh init_database.sh $config_json"
+sudo su - $control_user -c   "cd /softwares/cloudnative/cluster/ && bash init_database.sh $config_json"
 
 
 }
@@ -969,9 +969,11 @@ sudo su - $control_user -c   "cd /softwares/cloudnative/cluster/ && sh init_data
 control_machine
 check_xpanel_sshport_passwd
 check_host_sshport_passwd
+check_klustron_exist
 distribution_file
 execute_file
 set_permission
+distribution_kunlun_key
 #install_klustron_cluster
 
 
