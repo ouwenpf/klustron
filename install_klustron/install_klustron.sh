@@ -178,7 +178,7 @@ if [ -f "/etc/os-release" ]; then
   	        if [[ $? == 0 ]];then
                    
              if ! sudo egrep -q "^$control_user.*NOPASSWD: ALL$"  /etc/sudoers;then
-               sed -ri '/Allow root to run any commands anywhere/a '${control_user:-kunlun}'  ALL=(ALL)  NOPASSWD: ALL'  /etc/sudoers  &>/dev/null 
+               sudo sed -ri '/Allow root to run any commands anywhere/a '${control_user:-kunlun}'  ALL=(ALL)  NOPASSWD: ALL'  /etc/sudoers  &>/dev/null 
                if [[ $? == 0 ]];then
                  echo  -e "$COL_START${GREEN}$1 User created successfully$COL_END"
                fi
@@ -191,7 +191,7 @@ if [ -f "/etc/os-release" ]; then
   
          else
           if ! sudo egrep -q "^$control_user.*NOPASSWD: ALL$"  /etc/sudoers;then
-            sed -ri '/Allow root to run any commands anywhere/a '${control_user:-kunlun}'  ALL=(ALL)  NOPASSWD: ALL'  /etc/sudoers  &>/dev/null 
+            sudo sed -ri '/Allow root to run any commands anywhere/a '${control_user:-kunlun}'  ALL=(ALL)  NOPASSWD: ALL'  /etc/sudoers  &>/dev/null 
             if [[ $? == 0 ]];then
               echo  -e "$COL_START${GREEN}$1 User created successfully$COL_END"
             fi
