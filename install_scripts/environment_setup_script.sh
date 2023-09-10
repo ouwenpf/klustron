@@ -38,7 +38,7 @@ do
          
          
   expect <<EOF  >/dev/null 2>&1
-
+  
   spawn ssh -p${control_machines[2]} ${control_machines[0]}@${machines_list[$i]} "echo Password is correct" 
   expect {
     "yes/no" { send "yes\n"; exp_continue }
@@ -116,8 +116,7 @@ for i in $(seq 0 $((${#machines_list[*]}-1)))
 
 expect <<EOF  >/tmp/node_mgr 2>/dev/null
 	#spawn  ssh -p${control_machines[2]} ${klustron_user}@${machines_list[$i]} "test -s ${klustron_basedir}/kunlun-node-manager-$klustron_VERSION/bin/start_node_mgr.sh"
-
-
+  set timeout 300
   spawn  ssh -p${control_machines[2]} ${control_machines[0]}@${machines_list[$i]} "ps aux | grep -w '${klustron_basedir}/kunlun-node-manager-${klustron_VERSION}' | grep -v grep|wc -l" 
    
   	expect {
@@ -188,7 +187,7 @@ if [[ -s ${host_setup} ]];then
     #echo "...............${ip_list[i]}.................."
     #echo "Upload files  ${file_name} to ${ip_list[i]}"
 expect <<EOF  >/dev/null 2>&1
-
+  set timeout 300
 	spawn  sudo scp -P${control_machines[2]}  -rp ${host_setup}   ${control_machines[0]}@${machines_list[$i]}:/tmp
   
 	expect {
@@ -203,7 +202,7 @@ EOF
 
 
 if [[ $? == 0 ]];then
-  echo -e "$COL_START${GREEN}Upload files  ${host_setup} to ${machines_list[$i]} successful$COL_END"   
+  echo -e "$COL_START${GREEN}Upload files  ${host_setup}  to ${machines_list[$i]} successful$COL_END"   
 else
   echo -e "$COL_START${RED}${control_machines[0]}@${machines_list[$i]}文件拷贝失败$COL_END"
   let count_distribution_host_file++
@@ -227,6 +226,7 @@ fi
 #需要安装docker的主机打上标记
 
 expect <<EOF  >/dev/null 2>&1
+  set timeout 300
   spawn  sudo ssh -p${control_machines[2]} ${control_machines[0]}@${klustron_xpanel_list} "sudo echo 'docker' > /tmp/docker.log"
   
 	expect {
@@ -261,14 +261,12 @@ fi
 
 
 
-
-
-
-
 execute_file(){
 
 
-#for xpanel
+
+
+
 for i in  $(seq 0 $((${#machines_list[*]}-1)))
 do
 
@@ -276,7 +274,8 @@ do
 
 
 expect <<EOF  >/tmp/check_flag.log #>/dev/null 2>&1
-  spawn  sudo ssh -p${control_machines[2]}  ${control_machines[0]}@${machines_list[$i]} "test -f /tmp/${host_setup} && sudo bash /tmp/${host_setup} ${klustron_user}  ${klustron_basedir}" 
+  set timeout 300
+  spawn  sudo ssh -p${control_machines[2]}  ${control_machines[0]}@${machines_list[$i]} "test -f /tmp/${host_setup} && sudo bash   /tmp/${host_setup} ${klustron_user}  ${klustron_basedir}" 
 	expect {
 		"yes/no" { send "yes\n"; exp_continue }
 		"password" { send "${control_machines[1]}\n" }
@@ -288,7 +287,7 @@ expect <<EOF  >/tmp/check_flag.log #>/dev/null 2>&1
 EOF
 
 
-
+ 
 
 if egrep -q 'docker.*failed' /tmp/check_flag.log ;then
   echo  -e "$COL_START${RED}请检查${machines_list[$i]}主机上是否安装好docker并确定已经成功启动$COL_END"   
@@ -297,7 +296,7 @@ elif egrep -q 'Basic.*failed' /tmp/check_flag.log ;then
   echo  -e "$COL_START${RED}请检查${machines_list[$i]}主机初始化环境失败$COL_END"  
   let count_Basic_flag++
 else 
-  echo  -e "$COL_START${GREEN}请检查${machines_list[$i]}主机初始化环境成功$COL_END" 
+  echo  -e "$COL_START${GREEN}${machines_list[$i]}主机初始化环境成功$COL_END" 
 fi
 
 
@@ -305,11 +304,10 @@ fi
 done
 
 
-
 if [[ $count_docker_flag -ge 1 ]] || [[ $count_Basic_flag -ge 1 ]];then
-	exit
+  echo ''
+	#exit
 fi
-
 
 }
 
@@ -326,9 +324,7 @@ sudo su - $klustron_user -c   "cd $klustron_key && bash key_distribution.sh"
 
 
 
-
 }
-
 
 
 
@@ -340,10 +336,11 @@ sudo su - $klustron_user -c   "cd $klustron_key && bash key_distribution.sh"
 
 check_machines_sshport_passwd
 
-#check_klustron_exist
+check_klustron_exist
 
-#distribution_file
+distribution_file
 
-#execute_file
+execute_file
 
-#distribution_klustron_key
+distribution_klustron_key
+

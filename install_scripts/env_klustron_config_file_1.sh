@@ -38,48 +38,7 @@ fi
   
   
   
-if [[ -f "/etc/os-release" ]]; then
-    source /etc/os-release
-    
-      if [[ "$ID" == "ubuntu" ]]; then
-        #echo  -e "$COL_START${GREEN}OS is Ubuntu$COL_END"
-        for i in figlet expect dos2unix
-        do
-           if ! command -v "$1" &> /dev/null; then
-             sudo apt-get install -y $i &>/dev/null
-             if [[ $? -ne 0  ]];then
-               echo  -e "$COL_START${RED}$i命令安装失败$COL_END"
-               exit
-             fi
-           fi
-        
-        done
-        
-        
-      elif [[ "$ID" == "centos" ]]; then
-        #echo  -e "$COL_START${GREEN}OS is CentOS$COL_END"
-        for i in figlet expect dos2unix
-        do
-           if ! command -v "$1" &> /dev/null; then
-             sudo yum install -y $i &>/dev/null
-             if [[ $? -ne 0  ]];then
-               echo  -e "$COL_START${RED}$i命令安装失败$COL_END"
-               exit
-             fi
-           fi
-        
-        done 
-        
-      else
-        echo  -e "$COL_START$RED未知系统$COL_END"
-        exit
 
-      fi
-    
-  else
-      echo "os-release文件不存,未知系统"
-	    exit
-fi
 
 
 

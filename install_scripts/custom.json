@@ -1,10 +1,10 @@
 {
-    "user": "tanyueyun",
-	"password": "kunlun#",
+    "user": "root",
+	"password": "123456",
     "sshport": 22,
     "machines": [
 	{
-        "ip": "172.16.125.13"
+        "ip": "172.16.125.12"
     } ,
 	
 	{

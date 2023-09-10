@@ -26,7 +26,16 @@ fi
 
 
 
+
+
+
+
+
+
+
 init_centos(){
+
+
 
 
 
@@ -82,6 +91,8 @@ if [[ $? == 0 ]];then
 else
   echo  -e "$COL_START${GREEN}postfix mariadb-libsr No installation present, no need for uninstallation$COL_END"
 fi 
+
+
 
 
 <<!
@@ -163,7 +174,7 @@ fi
 
 
 
-sudo yum install -y  python git wget yum-utils sysvinit-tools libaio libaio-devel expect  python3 jq figlet  --skip-broken  &>/dev/null
+sudo yum install -y  python git wget yum-utils sysvinit-tools libaio libaio-devel expect  python3 jq figlet  e2fsprogs-devel uuid-devel libuuid-devel --skip-broken  &>/dev/null
 if [[ $? == 0 ]];then
   echo  -e "$COL_START${GREEN}Basic package installation successful$COL_END"
 	
@@ -174,18 +185,24 @@ fi
 
 
 
-if [[ -s /tmp/docker.log ]];then
+
+
+
+
+if [[ -f /tmp/docker.log ]];then
   if ! sudo docker info 2>/dev/null|grep -iwq running;then
     if ! command -v docker &>/dev/null;then
       sudo yum-config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo &>/dev/null &&\
-      sudo yum install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin device-mapper-persistent-data lvm2  &>/dev/null &&\
-      sudo systemctl start docker.service &>/dev/null
+      sudo yum install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin device-mapper-persistent-data lvm2   &>/dev/null &&\
+      sudo systemctl start docker.service
+      
       if [[ $? -eq 0 ]];then
         echo  -e "$COL_START${GREEN}docker start successful$COL_END"
+	      sudo  rm  -f /tmp/docker.log  &>/dev/null
       else
         echo  -e "$COL_START${RED}docker start or install failed$COL_END"
-      
-        exit 88
+     	  sudo  rm  -f /tmp/docker.log  &>/dev/null
+         
       fi
       
       
@@ -193,9 +210,11 @@ if [[ -s /tmp/docker.log ]];then
       sudo systemctl start docker.service &>/dev/null 
       if [[ $? -eq 0 ]];then
         echo  -e "$COL_START${GREEN}docker start successful$COL_END"
+	      sudo  rm  -f /tmp/docker.log   &>/dev/null
       else
         echo  -e "$COL_START${RED}docker start failed$COL_END"
-        exit 66
+	      sudo  rm  -f /tmp/docker.log  &>/dev/null
+         
       fi
     
     fi
@@ -205,6 +224,8 @@ if [[ -s /tmp/docker.log ]];then
 
   
 fi
+
+
 
 
 }
@@ -380,9 +401,11 @@ if [[ -s /tmp/docker.log ]];then
       sudo systemctl start docker.service &>/dev/null
       if [[ $? -eq 0 ]];then
         echo  -e "$COL_START${GREEN}docker start successful$COL_END"
+	sudo  rm  -f /tmp/docker.log  &>/dev/null
       else
         echo  -e "$COL_START${RED}docker start or install failed$COL_END"
-        exit 
+	sudo  rm  -f /tmp/docker.log  &>/dev/null
+         
       fi
       
       
@@ -390,9 +413,11 @@ if [[ -s /tmp/docker.log ]];then
       sudo systemctl start docker.service &>/dev/null 
       if [[ $? -eq 0 ]];then
         echo  -e "$COL_START${GREEN}docker start successful$COL_END"
+	sudo  rm  -f /tmp/docker.log  &>/dev/null
       else
         echo  -e "$COL_START${RED}docker start failed$COL_END"
-        exit
+	sudo  rm  -f /tmp/docker.log  &>/dev/null
+        
       fi
     
     fi
@@ -406,8 +431,14 @@ fi
 
 
 
-
 }
+
+
+
+
+
+
+
 
 
 
@@ -417,11 +448,12 @@ if [ -f "/etc/os-release" ]; then
   echo  -e "$COL_START${GREEN}正在安装必要的软件包$COL_END"
     if [[ "$ID" == "ubuntu" ]]; then
       echo  -e "$COL_START${GREEN}OS is Ubuntu$COL_END"
+      
       init_ubuntu 
     elif [[ "$ID" == "centos" ]]; then
       echo  -e "$COL_START${GREEN}OS is CentOS$COL_END"
+      
       init_centos  
-      echo $?
     else
       echo  -e "$COL_START$RED未知系统$COL_END"
       exit

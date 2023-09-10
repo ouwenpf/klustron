@@ -14,6 +14,7 @@ config_json='../klustron_config.json'
 control_machines=($(jq  '.user,.password,.sshport'  $custom_json|xargs))
 machines_list=($(jq '.machines[].ip' $custom_json|xargs))
 host_setup='host_setup.sh'
+host_docker='host_docker.sh'
 
 #获取kunlun用户,目录,IP等信息
 klustron_user=$(jq  '.machines[].user'  $config_json|sort|uniq|xargs)
@@ -112,13 +113,13 @@ if [ -f "/etc/os-release" ]; then
           if ! id $klustron_user &>/dev/null;then 
   	        #groupadd -g 1007 $klustron_user 
             #useradd  -u 1007 -g 1007 $klustron_user
-  	        sudo useradd  $klustron_user  &>/dev/null   &&\
+  	        sudo useradd  $klustron_user    &>/dev/null  &&\  
   	        echo "$passwd"|sudo passwd  --stdin $klustron_user &>/dev/null 
    
   	        if [[ $? == 0 ]];then
                    
              if ! sudo egrep -q "^$klustron_user.*NOPASSWD: ALL$"  /etc/sudoers;then
-               suod sed -ri '/Allow root to run any commands anywhere/a '${klustron_user:-kunlun}'  ALL=(ALL)  NOPASSWD: ALL'  /etc/sudoers  &>/dev/null 
+               sudo sed -ri '/Allow root to run any commands anywhere/a '${klustron_user:-kunlun}'  ALL=(ALL)  NOPASSWD: ALL'  /etc/sudoers  #&>/dev/null 
                if [[ $? == 0 ]];then
                  echo  -e "$COL_START${GREEN}$klustron_user User created successfully$COL_END"
                else 
@@ -167,9 +168,7 @@ fi
 
 
 if id $klustron_user &>/dev/null;then
-  cd ../../.. &&\
-  sudo chown -R $klustron_user:$klustron_user cloudnative &>/dev/null &&\
-  cd -  &>/dev/null
+  sudo chown -R $klustron_user:$klustron_user $(pwd|awk  -F '/'  '{print "/"$2}') &>/dev/null 
     if [[ $? -ne 0 ]];then
       echo -e "$COL_START${RED}控制机上cloudnative目录权限设置失败$COL_END"
       exit
