@@ -1,8 +1,39 @@
 #!/bin/bash
 
-. ./env_klustron_config_file_1.sh
+COL_START='\e['
+COL_END='\e[0m'
+RED='31m'
+GREEN='32m'
+YELLOW='33m'
+
+custom_json='custom.json'
+config_json='../klustron_config.json'
 
 
+
+if [[ ! -s  $custom_json ]] ;then
+  echo  -e "$COL_START${RED}当前目录下不存在$custom_json配置文件$COL_END" 
+  exit
+
+elif ! nc -z  www.kunlunbase.com  80  &>/dev/null ;then   
+  echo  -e "$COL_START$RED当前主机网络异常$COL_END"
+  exit
+
+elif [[ $(echo `pwd`|grep 'cloudnative/cluster/install_scripts$'|wc -l)  -ne 1 ]]; then
+	echo  -e "$COL_START$RED请确保当前$0脚本在../cloudnative/cluster/install_scripts目录下 $COL_END"
+	exit 
+ 
+fi  
+  
+  
+
+if ! jq  '.'  custom.json &>/dev/null;then
+  echo -e "$COL_START$RED$custom_json syntax error$COL_END"
+  exit    
+else
+  control_machines=($(jq  '.user,.password,.sshport'  $custom_json|xargs))
+  machines_list=($(jq '.machines[].ip' $custom_json|sort -u|xargs))
+fi  
 
 
 # 检查IP数量是否小于3，如果是，则显示消息并退出
@@ -99,6 +130,8 @@ xpanel=$(cat <<EOF
 EOF
 )
 
+
+if [[ ! -s ../klustron_config.json ]] ;then
 # 生成完整的 JSON 配置文件
 cat <<EOF > ../klustron_config.json
 {
@@ -133,5 +166,24 @@ cat <<EOF > ../klustron_config.json
 EOF
 
 
-echo  -e "$COL_START${GREEN}配置文件klustron_config.json已生成$COL_END"
+  if ! jq  '.'  $config_json &>/dev/null;then
+    echo -e "$COL_START$RED$config_json syntax error$COL_END"
+    exit
+  else 
+    echo  -e "$COL_START${GREEN}主配置文件已生成$COL_END"
+  fi  
 
+
+  
+else
+
+  if ! jq  '.'  $config_json &>/dev/null;then
+    echo -e "$COL_START$RED$config_json syntax error$COL_END"
+    exit
+  else 
+    echo  -e "$COL_START${GREEN}主配置文件已生成$COL_END"
+    
+  fi  
+
+
+fi 

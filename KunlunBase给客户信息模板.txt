@@ -14,4 +14,27 @@ http://zettatech.tpddns.cn:18080/KunlunXPanel/
 
 
 
+对外:
+PGPASSWORD=abc psql -h zettatech.tpddns.cn -U abc -p 30181 -d postgres
+psql postgres://abc:abc@zettatech.tpddns.cn:30181/postgres
 
+mysql -uabc -pabc -hzettatech.tpddns.cn -P30182
+http://zettatech.tpddns.cn:30150/KunlunXPanel/   aA_123456
+
+192.168.0.102  kunlun/Guest1#
+192.168.0.107
+192.168.0.147
+
+
+
+
+自己测试对外:
+
+PGPASSWORD=abc psql -h 121.15.182.140 -U abc -p 47001 -d postgres
+psql postgres://abc:abc@121.15.182.140:47001/postgres
+
+MySQL 协议连接方式：
+mysql -h 121.15.182.140 -uabc -pabc -P 47002
+http://121.15.182.140:18080/KunlunXPanel/
+账户：super_dba
+密码：aA_123456

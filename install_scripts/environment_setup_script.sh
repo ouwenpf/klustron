@@ -1,5 +1,6 @@
 #!/bin/bash
-. ./env_setup_script_2.sh
+. ./env_global.sh
+. ./env_environment_setup.sh
 
 
 check_machines_sshport_passwd(){
@@ -188,7 +189,7 @@ if [[ -s ${host_setup} ]];then
     #echo "Upload files  ${file_name} to ${ip_list[i]}"
 expect <<EOF  >/dev/null 2>&1
   set timeout 300
-	spawn  sudo scp -P${control_machines[2]}  -rp ${host_setup}   ${control_machines[0]}@${machines_list[$i]}:/tmp
+	spawn  sudo scp -P${control_machines[2]}  -rp ${host_setup}  ${control_machines[0]}@${machines_list[$i]}:/tmp
   
 	expect {
 		"yes/no" { send "yes\n"; exp_continue }
@@ -202,7 +203,8 @@ EOF
 
 
 if [[ $? == 0 ]];then
-  echo -e "$COL_START${GREEN}Upload files  ${host_setup}  to ${machines_list[$i]} successful$COL_END"   
+  #echo -e "$COL_START${GREEN}Upload files  ${host_setup}  to ${machines_list[$i]} successful$COL_END"   
+  echo -e "$COL_START${GREEN}${control_machines[0]}@${machines_list[$i]}文件拷贝成功$COL_END" 
 else
   echo -e "$COL_START${RED}${control_machines[0]}@${machines_list[$i]}文件拷贝失败$COL_END"
   let count_distribution_host_file++
@@ -245,7 +247,7 @@ EOF
 
 
 if [[ $? == 0 ]];then
-  echo -e "$COL_START${GREEN}${control_machines[0]}@${klustron_xpanel_list} docker-flag写人successful$COL_END"   
+  echo -e "$COL_START${GREEN}${control_machines[0]}@${klustron_xpanel_list}机器需要安装docker$COL_END"   
 else
   echo -e "$COL_START${RED}${control_machines[0]}@${klustron_xpanel_list} docker-flag写人失败$COL_END"
   let count_distribution_docker_flag++
@@ -275,7 +277,7 @@ do
 
 expect <<EOF  >/tmp/check_flag.log #>/dev/null 2>&1
   set timeout 300
-  spawn  sudo ssh -p${control_machines[2]}  ${control_machines[0]}@${machines_list[$i]} "test -f /tmp/${host_setup} && sudo bash   /tmp/${host_setup} ${klustron_user}  ${klustron_basedir}" 
+  spawn  sudo ssh -p${control_machines[2]}  ${control_machines[0]}@${machines_list[$i]} "test -f /tmp/${host_setup} &&  sudo bash  -x /tmp/${host_setup} ${klustron_user}  ${klustron_basedir}" 
 	expect {
 		"yes/no" { send "yes\n"; exp_continue }
 		"password" { send "${control_machines[1]}\n" }
@@ -305,8 +307,7 @@ done
 
 
 if [[ $count_docker_flag -ge 1 ]] || [[ $count_Basic_flag -ge 1 ]];then
-  echo ''
-	#exit
+	exit
 fi
 
 }
@@ -330,6 +331,42 @@ sudo su - $klustron_user -c   "cd $klustron_key && bash key_distribution.sh"
 
 
 
+preparation(){
+
+
+while true; do
+  echo  -e "$COL_START${GREEN}klustron分布式数据系统将部署在以下节点:$COL_END"
+  echo ${machines_list[*]}|xargs -n 1
+  echo -e "$COL_START${GREEN}所有机器都初始化成功按回车键继续安装集群退出请输入q|Q$COL_END" 
+    read -t 300 -rsn1 input
+    
+    if [[ "$input" == "q" || "$input" == "Q" ]]; then
+        exit
+    elif [[ "$input" == "" ]]; then
+        break
+    fi 
+done
+ 
+
+}
+
+
+
+
+
+
+
+
+cluster_setup(){
+
+sudo su - $klustron_user -c   "cd $klustron_key && bash cluster_setup.sh"
+
+
+
+
+}
+
+
 
 
 
@@ -344,3 +381,7 @@ execute_file
 
 distribution_klustron_key
 
+
+preparation
+
+cluster_setup

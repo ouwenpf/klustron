@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 COL_START='\e['
 COL_END='\e[0m'
 RED='31m'
@@ -19,11 +18,6 @@ elif [ $# -ne 2 ];then
   echo  -e "$COL_START${RED}Usage:  please input klustron_user and klustron_basedir$COL_END"
 	exit 
 fi
-
-
-
-
-
 
 
 
@@ -174,7 +168,7 @@ fi
 
 
 
-sudo yum install -y  python git wget yum-utils sysvinit-tools libaio libaio-devel expect  python3 jq figlet  e2fsprogs-devel uuid-devel libuuid-devel --skip-broken  &>/dev/null
+sudo yum install -y  python git wget yum-utils sysvinit-tools libaio libaio-devel expect  python3 jq figlet e2fsprogs-devel uuid-devel libuuid-devel   --skip-broken  &>/dev/null
 if [[ $? == 0 ]];then
   echo  -e "$COL_START${GREEN}Basic package installation successful$COL_END"
 	
@@ -382,7 +376,7 @@ fi
 
 sudo bash -c 'echo "deb http://archive.ubuntu.com/ubuntu/ xenial-updates main restricted" >> /etc/apt/sources.list' &>/dev/null &&\
 sudo apt-get update &>/dev/null &&\
-sudo apt-get install -y git apt-utils libicu-dev  libreadline-dev zlib1g-dev flex bison libssl-dev libcrypt-dev gcc g++ pkg-config python2 python2-dev libncurses5  locales python-setuptools unzip chrony expect jq figlet  curl lsb-release gnupg gnupg-l10n gnupg-utils net-tools iputils-ping sshpass &>/dev/null
+sudo apt-get install -y git apt-utils libicu-dev  libreadline-dev zlib1g-dev flex bison libssl-dev libcrypt-dev gcc g++ pkg-config python2 python2-dev libncurses5  locales python-setuptools unzip chrony expect jq figlet  curl lsb-release gnupg gnupg-l10n gnupg-utils net-tools iputils-ping sshpass e2fsprogs  uuid-dev libossp-uuid-dev &>/dev/null
 if [[ $? == 0 ]];then
   echo  -e "$COL_START${GREEN}Basic package installation successful$COL_END"
 	
