@@ -7,33 +7,13 @@ GREEN='32m'
 YELLOW='33m'
 
 
-
-
-if ! nc -z  www.kunlunbase.com  80  &>/dev/null ;then   
-  echo  -e "$COL_START$RED当前主机网络异常$COL_END"
-  exit
-
-
-elif [[ ! -d  /softwares   ]];then
-  sudo mkdir -p /softwares &>/dev/null  
-  if [[ $? -ne 0 ]];then
-     echo -e "$COL_START$RED创建/softwares目失败录$COL_END"
-     exit
-  fi
-    
-fi
-
-
-
-
-
 if [[ -f "/etc/os-release" ]]; then
     source /etc/os-release
     
       if [[ "$ID" == "ubuntu" ]]; then
-        echo -e "$COL_START$GREEN正在下载最新程序请稍后........$COL_END"
+        echo -e "$COL_START${YELLOW}正在下载最新程序请稍后........$COL_END"
         #echo  -e "$COL_START${GREEN}安装klustron数据库集群之前先阅读以下内容.....$COL_END"
-        for i in figlet expect dos2unix jq
+        for i in figlet expect dos2unix jq nc
         do
            if ! command -v "$1" &> /dev/null; then
              sudo apt-get install -y $i &>/dev/null
@@ -47,9 +27,9 @@ if [[ -f "/etc/os-release" ]]; then
         
         
       elif [[ "$ID" == "centos" ]]; then
-        echo -e "$COL_START$GREEN正在下载最新程序请稍后........$COL_END"
+        echo -e "$COL_START${YELLOW}正在下载最新程序请稍后........$COL_END"
         #echo  -e "$COL_START${GREEN}安装klustron数据库集群之前先阅读以下内容.....$COL_END"
-        for i in figlet expect dos2unix jq
+        for i in figlet expect dos2unix jq nc
         do
            if ! command -v "$1" &> /dev/null; then
              sudo yum install -y $i &>/dev/null
@@ -76,9 +56,19 @@ fi
 
 
 
+if ! nc -z  www.kunlunbase.com  80  &>/dev/null ;then   
+  echo  -e "$COL_START$RED当前主机网络异常$COL_END"
+  exit
 
 
-
+elif [[ ! -d  /softwares   ]];then
+  sudo mkdir -p /softwares &>/dev/null  
+  if [[ $? -ne 0 ]];then
+     echo -e "$COL_START$RED创建/softwares目失败录$COL_END"
+     exit
+  fi
+    
+fi
 
 
 
@@ -103,11 +93,6 @@ fi
 
 
 
-
-
-
-
-
 while true; do
   echo -e "$COL_START$RED为了确保集群安装成功,请您仔细阅读以下内容........$COL_END"
   sleep 3
@@ -124,11 +109,11 @@ while true; do
   3.程序目录和下载:程序下载路径为/softwares/
   4.编辑全局配置文件：
     假如三台服务器
-    机器IP:192.168.0.1
-           192.168.0.2
-           192.168.0.3
+    机器IP:172.16.128.10
+           172.16.128.11
+           172.16.128.12
     用户名:root,默认为root,可以使用具有root权限的用户,具体根据实际情况配置
-    密码:password
+    密码:password,需要修改为对应账户的密码
     ssh端口:22,默认22,非22端口根据实际情况配置
     配置信息范例如下:
     cd /softwares/cloudnative/cluster/install_scripts
@@ -140,15 +125,15 @@ while true; do
     "sshport": 22,
     "machines": [
         {
-        "ip": "192.168.0.1" 
+        "ip": "172.16.128.10" 
         } ,
 
         {
-        "ip": "192.168.0.2"
+        "ip": "172.16.128.11"
         } ,
 
         {
-        "ip": "192.168.0.3"
+        "ip": "172.16.128.12"
         }
         ]
     }
@@ -158,15 +143,19 @@ while true; do
   我们将尽力快速解决您的问题.
   $COL_END"
   
-  echo -e "$COL_START$RED按q|Q退出,前去集群安装配置........$COL_END" 
+  echo -e "$COL_START${YELLOW}按q|Q退出,前去集群安装配置........$COL_END" 
   read -t 300 -rsn1 input
     
     if [[ "$input" == "Q" || "$input" == "q" ]]; then
-        echo -e "$COL_START${RED}
-        cd /softwares/cloudnative/cluster/install_scripts
-        vim custom.json
-        sudo bash install_wizard.sh 开始集群安装吧!!!
-        $COL_END" 
+  echo -e "$COL_START$RED集群安装配置只需要简单三步$COL_END"
+  echo -e "$COL_START${RED}
+  1. cd /softwares/cloudnative/cluster/install_scripts
+  2. vim custom.json  添加好机器IP,具体可以参考上面说明
+  3. sudo bash install_wizard.sh
+  开始集群安装吧!!!
+        $COL_END"
+
+
         
         exit
     fi

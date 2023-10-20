@@ -59,7 +59,7 @@ if [ -f "/etc/os-release" ]; then
           if ! id $klustron_user &>/dev/null;then 
   	        #groupadd -g 1007 $klustron_user 
             #useradd  -u 1007 -g 1007 $klustron_user
-  	        sudo useradd  $klustron_user &>/dev/null &\
+  	        sudo useradd  $klustron_user &>/dev/null &&\
   	        echo "$passwd"|sudo passwd  --stdin $klustron_user  &>/dev/null
    
   	        if [[ $? == 0 ]];then 
