@@ -20,11 +20,17 @@ http://zettatech.tpddns.cn:14000/releases/				          	外网版本信息
 trac账号，用于登录tracbiz 外网地址：https://zettatech.tpddns.cn:11443/wiki  
 内网地址为 http://192.168.0.104:11000  
 用户名为tanyueyun 密码为  TbRGc3ga1  
+改为：kunlunbase
+改为：kunlunbase.2023
 http://192.168.0.104:8080/job/enterprise_clustermgr_build/  jenkins编译和构建
 zettadb
 cJXtT7mtn
  
 
+Klustron 数据库相关文档:
+http://doc.klustron.com/zh/why_Klustron.html
+Klustron 数据库一键安装脚本:
+http://doc.klustron.com/zh/Deploy_the_klustron_cluster_with_one_click.html
 
 
 --set_cluster_id(9)      连接集群ID为9，然后设置集群ID为1且连接这个集群

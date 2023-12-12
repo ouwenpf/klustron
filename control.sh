@@ -34,6 +34,8 @@ wget http://zettatech.tpddns.cn:14000/releases/$VERSION/release-binaries/kunlun-
 wget http://zettatech.tpddns.cn:14000/releases/$VERSION/release-binaries/kunlun-server-$VERSION.tgz
 wget http://zettatech.tpddns.cn:14000/releases/$VERSION/release-binaries/kunlun-storage-$VERSION.tgz
 wget http://zettatech.tpddns.cn:14000/releases/$VERSION/release-binaries/kunlun-proxysql-$VERSION.tgz
+wget http://zettatech.tpddns.cn:14000/releases/$VERSION/release-binaries/kunlun-xpanel-$VERSION.tgz
+wget http://zettatech.tpddns.cn:14000/releases/$VERSION/release-binaries/kunlun-cdc--$VERSION.tgz
 
 # 如果需要使用elasticsearch/kibana来收集并显示节点的日志信息, 则还需要以下两个包:
 wget http://zettatech.tpddns.cn:14000/thirdparty/efk/elasticsearch-7.10.1.tar.gz
