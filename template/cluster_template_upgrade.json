@@ -1,0 +1,113 @@
+{
+    "config": {
+	"upgrade_all": false      
+  },
+    
+    "machines":[
+        {
+            "ip":"192.168.0.1",
+            "sshport":22,
+            "basedir":"/home/kunlun/klustron",
+            "user":"kunlun"
+        },
+        {
+            "ip":"192.168.0.2",
+            "sshport":22,
+            "basedir":"/home/kunlun/klustron",
+            "user":"kunlun"
+        },
+        {
+            "ip":"192.168.0.3",
+            "sshport":22,
+            "basedir":"/home/kunlun/klustron",
+            "user":"kunlun"
+        }
+    ],
+    "meta":{
+        "ha_mode":"rbr",
+		"config":{
+			"innodb_buffer_pool_size":"1024MB",
+			"innodb_page_size":16384,
+			"max_binlog_size": 1073741824,
+			"lock_wait_timeout":1200,
+			"innodb_lock_wait_timeout":1200
+		},
+        "nodes":[
+            {
+                "ip":"192.168.0.1",
+                "port":56001
+            },
+            {
+                "ip":"192.168.0.2",
+                "port":56001
+            },
+            {
+                "ip":"192.168.0.3",
+                "port":56001
+            }
+        ]
+    },
+    "cluster_manager":{
+    	"upgrade_all": false,
+        "nodes":[
+            {
+                "ip":"192.168.0.1",
+                "brpc_http_port":58000,
+                "brpc_raft_port":58001,
+                "prometheus_port_start":59010
+            },
+            {
+                "ip":"192.168.0.2",
+                "brpc_http_port":58000,
+                "brpc_raft_port":58001,
+                "prometheus_port_start":59010
+            },
+            {
+                "ip":"192.168.0.3",
+                "brpc_http_port":58000,
+                "brpc_raft_port":58001,
+                "prometheus_port_start":59010
+            }
+        ]
+    },
+    "node_manager":{
+    	"upgrade_nodemgr": false,
+    	"upgrade_server": false,
+    	"upgrade_storage": false,
+        "nodes":[
+            {
+                "ip":"192.168.0.1",
+                "brpc_http_port":58002,
+                "tcp_port":58003,
+                "prometheus_port_start":58010,
+				"storage_portrange": "57000-58000",
+				"server_portrange": "47000-48000"
+
+            },
+            {
+                "ip":"192.168.0.2",
+                "brpc_http_port":58002,
+                "tcp_port":58003,
+                "prometheus_port_start":58010,
+				"storage_portrange": "57000-58000",
+				"server_portrange": "47000-48000"
+            },  
+			
+            {
+                "ip":"192.168.0.3",
+                "brpc_http_port":58002,
+                "tcp_port":58003,
+                "prometheus_port_start":58010,
+				"storage_portrange": "57000-58000",
+				"server_portrange": "47000-48000"
+            }
+        ]
+    },
+	
+    "xpanel":{
+    	"upgrade_all": false, 
+        "ip":"192.168.0.1",
+        "port":18080,
+        "image":"registry.cn-hangzhou.aliyuncs.com/kunlundb/kunlun-xpanel:VERSION"
+    }
+}
