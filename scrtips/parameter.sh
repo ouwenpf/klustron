@@ -6,6 +6,8 @@ db_cluster_id=${3:-1}
 
 # 执行查询并将结果存入数组
 mysql_result=$(PGPASSWORD=abc psql postgres://abc:abc@${host_ip}:${port_ip}/postgres -c "SELECT '-h' || b.hostaddr || ' -P' || b.port FROM pg_shard a JOIN pg_shard_node b ON a.id = b.shard_id WHERE a.db_cluster_id = ${db_cluster_id};" |sed '1d;2d;/rows/d;$d')
+
+# mapfile -t 将查询结果按行存入数组 connections中
 mapfile -t connections <<< "$mysql_result"
 
 
