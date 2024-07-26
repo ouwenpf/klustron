@@ -37,7 +37,7 @@ curl -d '
 
 curl -d '
 {
-          "version":"1.0",
+        "version":"1.0",
         "job_id":"",
         "job_type":"create_cluster",
         "user_name":"kunlun_test",
@@ -53,7 +53,7 @@ curl -d '
               "cpu_cores":"8",
               "innodb_size":"1",
               "data_storage_MB":"1024",
-	      "log_storage_MB":"1024",
+	          "log_storage_MB":"1024",
               "dbcfg":"0",
               "fullsync_level": "1",
               "storage_iplists": [
