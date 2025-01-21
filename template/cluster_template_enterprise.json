@@ -128,7 +128,12 @@
     ]
   },
 
-	
+    "license": {
+        "custom_info": "kunlun_test",
+        "issue_time": "1727598194",
+        "valid_days": 3600
+     },
+
    "xpanel":{
     	"upgrade_all": false, 
         "imageType": "file",

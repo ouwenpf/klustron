@@ -1,6 +1,7 @@
 {
     "config": {
-	"upgrade_all": false      
+	"upgrade_all": false,      
+	"send_license": false
   },
     
     "machines":[
@@ -49,6 +50,9 @@
     },
     "cluster_manager":{
     	"upgrade_all": false,
+    	"config": {
+	            "skip_license_check": "on"
+    			  },
         "nodes":[
             {
                 "ip":"192.168.0.1",
@@ -75,6 +79,9 @@
     	"upgrade_server": false,
     	"upgrade_storage": false,
     	"upgrade_proxysql": false,
+    	"config": {
+	            "skip_license_check": "on"
+    			  },
         "nodes":[
             {
                 "ip":"192.168.0.1",
@@ -128,7 +135,6 @@
     ]
   },
 
-	
    "xpanel":{
     	"upgrade_all": false, 
         "imageType": "file",
