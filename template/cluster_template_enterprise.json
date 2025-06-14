@@ -1,8 +1,16 @@
 {
     "config": {
-	"upgrade_all": false      
+	"upgrade_all": false ,    
+	"enable_rocksdb": true 
   },
     
+     "license": {
+        "custom_info": "kunlun_test",
+        "issue_time": "1727598194",
+        "valid_days": 3600
+     },
+
+ 
     "machines":[
         {
             "ip":"192.168.0.1",
@@ -128,11 +136,6 @@
     ]
   },
 
-    "license": {
-        "custom_info": "kunlun_test",
-        "issue_time": "1727598194",
-        "valid_days": 3600
-     },
 
    "xpanel":{
     	"upgrade_all": false, 

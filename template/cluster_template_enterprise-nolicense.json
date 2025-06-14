@@ -1,7 +1,8 @@
 {
     "config": {
 	"upgrade_all": false,      
-	"send_license": false
+	"send_license": false,
+	"enable_rocksdb": true 
   },
     
     "machines":[
